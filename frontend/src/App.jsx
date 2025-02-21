@@ -12,9 +12,11 @@ import Layout from './components/Layout'
 import NoPage from './pages/NoPage'
 import { UserProvider } from './context/UserContext'
 
+
 export default function App() {
   return (
     <BrowserRouter>
+
       <UserProvider>
 
             <Routes>
@@ -36,6 +38,7 @@ export default function App() {
             </Routes>
 
       </UserProvider>
+
     </BrowserRouter>
   )
 }
