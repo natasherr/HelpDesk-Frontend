@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Problems from "./pages/Problems";
 import Faqs from "./pages/Faqs";
 import Layout from './components/Layout';
+import NoPage from './pages/NoPage';
 import Notifications from "./pages/Notifications";  // Import the Notifications page
 
 export default function App() {
@@ -29,7 +30,7 @@ export default function App() {
             <Route path="about" element={<About />} />
             <Route path="faqs" element={<Faqs />} />
             <Route path="notifications" element={<Notifications />} /> {/* Add Notifications route */}
-            {/* <Route path="*" element={<NoPage />} /> */}
+             <Route path="*" element={<NoPage />} /> 
           </Route>
         </Routes>
       </div>
