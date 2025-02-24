@@ -35,6 +35,10 @@ const Navbar = () => {
               <Link to="/notifications" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
                 Notifications
               </Link>
+              <Link to="/categories" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                Categories
+              </Link>
+
             </nav>
           </div>
 

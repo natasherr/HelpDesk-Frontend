@@ -1,7 +1,8 @@
 // src/App.jsx
-
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { UserProvider } from "./context/UserContext";  // Import UserProvider
+import { HelpDeskProvider } from "./context/HelpDeskContext";  // Import HelpDeskProvider
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Categories from "./pages/Categories";
@@ -42,6 +43,7 @@ export default function App() {
           </HelpDeskProvider>    
         </UserProvider>
       </div>
+
     </BrowserRouter>
   );
 }
