@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import {UserContext} from '../context/UserContext'
 
 const Login = () => {
+  const {login} = useContext(UserContext)
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  // const navigate = useNavigate()
 
+  // To handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log(email, password);
+    login(email, password)
+    // console.log(email, password);
     // Add login functionality here
-     navigate('/'); // for example, after successful login
+    //  navigate('/'); // for example, after successful login
   };
 
   return (
@@ -24,9 +28,9 @@ const Login = () => {
               <div className="mb-12">
                 <h3 className="text-white-800 text-3xl font-extrabold">Sign in</h3>
                 <p className="text-sm mt-4 text-white-800">
-                  Don't have an account{' '}
+                  Don't have an account ?{' '}
                   <Link to="/register" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">
-                    Register here
+                    Register Here
                   </Link>
                 </p>
               </div>
@@ -38,8 +42,8 @@ const Login = () => {
                     name="email"
                     type="text"
                     required
-                    className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"
-                    placeholder="Enter email"
+                    className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none rounded-md" // Added rounded-md
+                    placeholder="user@domain.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -53,8 +57,8 @@ const Login = () => {
                     name="password"
                     type="password"
                     required
-                    className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"
-                    placeholder="Enter password"
+                    className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none rounded-md" // Added rounded-md
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -62,10 +66,6 @@ const Login = () => {
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
-                <div className="flex items-center">
-                  <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                  <label htmlFor="remember-me" className="ml-3 block text-sm text-white-800">Remember me</label>
-                </div>
                 <div>
                   <a href="javascript:void(0);" className="text-blue-600 font-semibold text-sm hover:underline">Forgot Password?</a>
                 </div>

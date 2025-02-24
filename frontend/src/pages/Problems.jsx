@@ -1,8 +1,29 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState,useMemo, useContext } from  "react";
 import { FaThumbsUp, FaThumbsDown, FaUser, FaSearch, FaFilter } from "react-icons/fa";
+import { HelpDeskContext } from "../context/HelpDeskContext";
+import { UserContext } from "../context/UserContext";
 
 const Problems = () => {
+
+  const { problem, solution, tag, vote, getProblemById, addProblem, updateProblem, deleteProblem, getSolutionByID, addSolution, updateSolution, deleteSolution, voteOnSolution, deleteVote, addTag, updateTag, deleteTag, getTagById} = useContext(HelpDeskContext);
+  
+  const {current_user} = useContext(UserContext)
+
+  const [problemId, setProblemId] = useState("");
+  const [description, setDescription] = useState("");
+  const [editingProblem, setEditingProblem] = useState(null);
+  // Controlling visibility of the question/problem form.
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+
+  const [solutionId, setSolutionId] = useState("");
+  const [voteType, setVoteType] = useState("");
+  const [voteId, setVoteId] = useState("");
+
+  // Tags
+  const [name, setName] = useState("");
+  const [tagId, setTagId] = useState("");
+
+
   const [questions, setQuestions] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
@@ -11,7 +32,7 @@ const Problems = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [editingQuestion, setEditingQuestion] = useState(null);
+
   const [editingReply, setEditingReply] = useState(null);
 
   const categories = [
@@ -100,7 +121,7 @@ const Problems = () => {
           : q
       )
     );
-    setEditingQuestion(null);
+    setEditingProblem(null);
   };
 
   const handleUpdateReply = (questionId, replyId, updatedText, updatedCategories) => {
@@ -149,12 +170,12 @@ const Problems = () => {
     const [editReplyText, setEditReplyText] = useState("");
     const [editReplyCategories, setEditReplyCategories] = useState([]);
 
-    if (editingQuestion?.id === question.id) {
+    if (editingProblem?.id === question.id) {
       return (
         <div className="bg-white rounded-lg shadow-md p-6 mb-4">
           <textarea
-            value={editingQuestion.description}
-            onChange={(e) => setEditingQuestion({ ...editingQuestion, description: e.target.value })}
+            value={editingProblem.description}
+            onChange={(e) => seteditingProblem({ ...editingProblem, description: e.target.value })}
             className="w-full p-3 border rounded-lg mb-4"
             rows="4"
           />
@@ -165,15 +186,15 @@ const Problems = () => {
                   key={category}
                   type="button"
                   onClick={() => {
-                    const isSelected = editingQuestion.categories.includes(category);
-                    setEditingQuestion({
-                      ...editingQuestion,
+                    const isSelected = editingProblem.categories.includes(category);
+                    seteditingProblem({
+                      ...editingProblem,
                       categories: isSelected
-                        ? editingQuestion.categories.filter(c => c !== category)
-                        : [...editingQuestion.categories, category]
+                        ? editingProblem.categories.filter(c => c !== category)
+                        : [...editingProblem.categories, category]
                     });
                   }}
-                  className={`px-4 py-2 rounded-full ${editingQuestion.categories.includes(category) ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"} transition-colors`}                >
+                  className={`px-4 py-2 rounded-full ${editingProblem.categories.includes(category) ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"} transition-colors`}                >
                   {category}
                 </button>
               ))}
@@ -181,13 +202,13 @@ const Problems = () => {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => handleUpdateQuestion(question.id, { description: editingQuestion.description, categories: editingQuestion.categories })}
+              onClick={() => handleUpdateQuestion(question.id, { description: editingProblem.description, categories: editingProblem.categories })}
               className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
             >
               Save
             </button>
             <button
-              onClick={() => setEditingQuestion(null)}
+              onClick={() => seteditingProblem(null)}
               className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
             >
               Cancel
