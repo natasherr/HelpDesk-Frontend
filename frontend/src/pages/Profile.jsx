@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FiEdit2, FiHelpCircle, FiCheckCircle, FiArrowRight } from "react-icons/fi";
 import { BsLightbulb } from "react-icons/bs";
 
-const HelpDeskProfile = () => {
+const Profile = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [userData, setUserData] = useState({
     username: "John Developer",
@@ -195,4 +195,4 @@ const HelpDeskProfile = () => {
   );
 };
 
-export default HelpDeskProfile;
+export default Profile;
