@@ -15,7 +15,7 @@ export const UserProvider = ({ children }) => {
     // LOGIN
     const login = (email, password) => {
         toast.loading("Logging you in ... ");
-        fetch("http://127.0.0.1:5000", {
+        fetch("http://127.0.0.1:5000/login", {
             method: "POST",
             headers: {
                 'Content-type': 'application/json',
@@ -86,7 +86,7 @@ export const UserProvider = ({ children }) => {
         fetchCurrentUser();
     }, []);
     
-    const fetchCurrentUser = () => {
+    const fetchCurrentUser  = () => {
         console.log("Current user fcn:", authToken);
         fetch('http://127.0.0.1:5000/current_user', {
             method: "GET",
@@ -95,32 +95,39 @@ export const UserProvider = ({ children }) => {
                 'Authorization': `Bearer ${authToken}`
             }
         })
-        .then((response) => response.json())
         .then((response) => {
+            console.log("Response Status:", response.status);
+            return response.json();
+        })
+        .then((response) => {
+            console.log("Response Data:", response);
             if (response.email) {
-                setCurrentUser(response);
+                setCurrentUser (response);
             }
+        })
+        .catch((error) => {
+            console.error("Fetch error:", error);
         });
     };
 
     // Add User
-    const addUser = (name, email, password) => {
+    const addUser = (username, email, password) => {
         toast.loading("Registering ... ");
-        fetch("http://127.0.0.1:5000/users/add", {
+        fetch("http://127.0.0.1:5000/users", {
             method: "POST",
             headers: {
                 'Content-type': 'application/json',
             },
             body: JSON.stringify({
-                name, email, password
+               username, email, password
             })
         })
         .then((resp) => resp.json())
         .then((response) => {
             console.log(response);
-            if (response.message) {
+            if (response.success) {
                 toast.dismiss();
-                toast.success(response.message);
+                toast.success(response.success);
                 navigate("/login");
             } else if (response.error) {
                 toast.dismiss();

@@ -1,26 +1,27 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+// import { useNavigate } from 'react-router-dom';
+import {UserContext} from '../context/UserContext'
 
 const Register = () => {
+
+  const {addUser} = useContext(UserContext);
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
+  // To handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match!");
-      return;
+      alert("Passwords do not match!");
     }
 
-    // Proceed with registration logic (e.g., API call to register user)
-    console.log({ username, email, password });
-    // On successful registration, redirect to login or home page
-    navigate("/login");
+    addUser(username, email, password)
+    console.log({ username, email});
   };
 
   const handleGitHubLogin = () => {
@@ -36,12 +37,12 @@ const Register = () => {
             <h1 className="text-2xl xl:text-3xl font-extrabold">Sign up</h1>
             <div className="w-full flex-1 mt-8">
               <div className="mx-auto max-w-xs">
-                {error && <div className="text-red-500 text-center">{error}</div>}
+                {/* {error && <div className="text-red-500 text-center">{error}</div>} */}
                 <form onSubmit={handleSubmit}>
                   <input
                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                     type="text"
-                    placeholder="Username"
+                    placeholder="Use a unique name!"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -49,7 +50,7 @@ const Register = () => {
                   <input
                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                     type="email"
-                    placeholder="Email"
+                    placeholder="user@domain.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -57,7 +58,7 @@ const Register = () => {
                   <input
                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                     type="password"
-                    placeholder="Password"
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -103,16 +104,6 @@ const Register = () => {
                   <span className="ml-4">Sign Up with GitHub</span>
                 </button>
 
-                <p className="mt-6 text-xs text-gray-600 text-center">
-                  I agree to abide by templatana's
-                  <a href="#" className="border-b border-gray-500 border-dotted">
-                    Terms of Service
-                  </a>
-                  and its
-                  <a href="#" className="border-b border-gray-500 border-dotted">
-                    Privacy Policy
-                  </a>
-                </p>
               </div>
             </div>
           </div>

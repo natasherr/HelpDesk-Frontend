@@ -1,20 +1,26 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+import React, { useState, useContext } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { UserContext } from '../context/UserContext'; // Import the UserContext
+import {UserContext} from '../context/UserContext'
+
 
 const Login = () => {
+  const {login} = useContext(UserContext)
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  // const navigate = useNavigate()
 
-  // Access the login, logout, and current_user from UserContext
-  const { login, logout, current_user } = useContext(UserContext);
 
+  // To handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Use the login function from context to log the user in
-    login(email, password); // Calls the login function with email and password
+    login(email, password)
+    // console.log(email, password);
+    // Add login functionality here
+    //  navigate('/'); // for example, after successful login
+
   };
 
   // Optional: Redirect if the user is already logged in
@@ -29,41 +35,46 @@ const Login = () => {
       <div className="min-h-screen flex flex-col items-center justify-center">
         <div className="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
           <div className="md:max-w-md w-full px-4 py-4">
-            {current_user ? (
-              <div className="text-center">
-                <h3 className="text-white-800 text-3xl font-extrabold">Welcome, {current_user.name}</h3>
-                <button
-                  onClick={logout} // Call the logout function from UserContext
-                  className="mt-4 py-2.5 px-4 text-sm tracking-wide rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none"
-                >
-                  Logout
-                </button>
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-12">
+                <h3 className="text-white-800 text-3xl font-extrabold">Sign in</h3>
+                <p className="text-sm mt-4 text-white-800">
+                  Don't have an account ?{' '}
+                  <Link to="/register" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">
+                    Register Here
+                  </Link>
+                </p>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit}>
-                <div className="mb-12">
-                  <h3 className="text-white-800 text-3xl font-extrabold">Sign in</h3>
-                  <p className="text-sm mt-4 text-white-800">
-                    Don't have an account{' '}
-                    <Link to="/register" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">
-                      Register here
-                    </Link>
-                  </p>
+
+              <div>
+                <label className="text-white-800 text-xs block mb-2">Email</label>
+                <div className="relative flex items-center">
+                  <input
+                    name="email"
+                    type="text"
+                    required
+                    className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none rounded-md" // Added rounded-md
+                    placeholder="user@domain.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+
                 </div>
 
-                <div>
-                  <label className="text-white-800 text-xs block mb-2">Email</label>
-                  <div className="relative flex items-center">
-                    <input
-                      name="email"
-                      type="text"
-                      required
-                      className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"
-                      placeholder="Enter email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
+              <div className="mt-8">
+                <label className="text-white-800 text-xs block mb-2">Password</label>
+                <div className="relative flex items-center">
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none rounded-md" // Added rounded-md
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+
                 </div>
 
                 <div className="mt-8">
@@ -89,6 +100,7 @@ const Login = () => {
                   <div>
                     <a href="javascript:void(0);" className="text-blue-600 font-semibold text-sm hover:underline">Forgot Password?</a>
                   </div>
+
                 </div>
 
                 <div className="mt-12">
