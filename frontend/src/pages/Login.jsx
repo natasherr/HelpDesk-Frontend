@@ -14,14 +14,15 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     login(email, password);
+
     // Add login functionality here
     // navigate('/'); // for example, after successful login
   };
 
-  // Optional: Redirect if the user is already logged in
+  // Redirect if the user is already logged in
   useEffect(() => {
     if (current_user) {
-      navigate('/'); // Redirect to the home page if the user is already logged in
+      navigate('/profile'); // Redirect to profile page after successful login
     }
   }, [current_user, navigate]);
 
@@ -81,6 +82,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+
                 </div>
               </div>
 
@@ -99,6 +101,7 @@ const Login = () => {
 
               <div className="my-4 flex items-center gap-4">
                 <hr className="w-full border-gray-300" />
+
                 <p className="text-sm text-white-800 text-center">or</p>
                 <hr className="w-full border-gray-300" />
               </div>
