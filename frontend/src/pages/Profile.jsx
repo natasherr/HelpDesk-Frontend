@@ -185,6 +185,7 @@ const UserProfile = () => {
                   <FiEdit2 className="w-4 h-4" />
                 </button>
               )}
+
             </div>
 
             <h2 className="mt-4 text-2xl font-bold text-white">{profile.username}</h2>
@@ -195,6 +196,7 @@ const UserProfile = () => {
                 className="bg-blue-500 h-2.5 rounded-full"
                 style={{ width: `${calculateProfileCompletion()}%` }}
               ></div>
+
             </div>
             <p className="mt-2 text-sm text-gray-400">
               Profile Completion: {Math.round(calculateProfileCompletion())}%
@@ -215,6 +217,7 @@ const UserProfile = () => {
                     onChange={handleInputChange}
                     className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   />
+
                 </div>
                 {errors.username && (
                   <p className="mt-1 text-sm text-red-600">{errors.username}</p>
@@ -233,6 +236,7 @@ const UserProfile = () => {
                     onChange={handleInputChange}
                     className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   />
+
                 </div>
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
