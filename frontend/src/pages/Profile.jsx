@@ -1,198 +1,272 @@
-import { useState } from "react";
-import { FiEdit2, FiHelpCircle, FiCheckCircle, FiArrowRight } from "react-icons/fi";
-import { BsLightbulb } from "react-icons/bs";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDropzone } from "react-dropzone";
+import { FiEdit2, FiUpload, FiUser, FiMail } from "react-icons/fi";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
-const Profile = () => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [userData, setUserData] = useState({
-    username: "John Developer",
-    email: "john.dev@example.com",
-    profilePic: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9",
-    stats: {
-      problemsSubmitted: 24,
-      helpfulVotes: 156,
-      solutionsProvided: 47
-    },
-    solutions: [
-      {
-        id: 1,
-        title: "Fixed API Authentication Issue",
-        date: "2024-01-15",
-        votes: 23,
-        status: "Accepted"
-      },
-      {
-        id: 2,
-        title: "Database Optimization Solution",
-        date: "2024-01-10",
-        votes: 15,
-        status: "Pending"
-      }
-    ],
-    problems: [
-      {
-        id: 1,
-        title: "React Performance Issues",
-        date: "2024-01-05",
-        status: "Open",
-        solutions: 3
-      },
-      {
-        id: 2,
-        title: "Authentication Flow Bug",
-        date: "2024-01-01",
-        status: "Resolved",
-        solutions: 5
-      }
-    ]
+const UserProfile = () => {
+  const { current_user, updateUser } = useContext(UserContext); 
+  const navigate = useNavigate(); 
+
+  const [profile, setProfile] = useState({
+    username: "",
+    email: "",
+    profilePicture: "",
   });
 
-  const EditProfileModal = () => (
-    <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ${isEditModalOpen ? 'block' : 'hidden'}`}>
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 dark:text-white">Edit Profile</h2>
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
-            <div className="mt-1 flex items-center">
-              <img src={userData.profilePic} alt="Profile" className="h-12 w-12 rounded-full" />
-              <button type="button" className="ml-4 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                Change
-              </button>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-            <input type="text" defaultValue={userData.username} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-            <input type="email" defaultValue={userData.email} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" />
-          </div>
-          <div className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={() => setIsEditModalOpen(false)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState(profile);
+  const [errors, setErrors] = useState({});
+  const [isUploading, setIsUploading] = useState(false);
+  const [crop, setCrop] = useState({ unit: "%", width: 50, aspect: 1 });
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [tempImage, setTempImage] = useState(null);
+  const [croppedImageUrl, setCroppedImageUrl] = useState(null);
+
+  useEffect(() => {
+    if (!current_user) {
+      navigate("/login");
+    } else {
+      setProfile({
+        username: current_user.username,
+        email: current_user.email,
+        profilePicture: current_user.profilePicture || "",
+      });
+      setFormData({
+        username: current_user.username,
+        email: current_user.email,
+        profilePicture: current_user.profilePicture || "",
+      });
+    }
+  }, [current_user, navigate]);
+
+  useEffect(() => {
+    if (current_user) {
+      localStorage.setItem("user", JSON.stringify(current_user));
+    }
+  }, [current_user]);
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size should be less than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setTempImage(reader.result);
+        setShowCropModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      "image/jpeg": [],
+      "image/png": [],
+    },
+    maxSize: 5 * 1024 * 1024,
+  });
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (formData.username.length < 3 || formData.username.length > 20) {
+      newErrors.username = "Username must be between 3 and 20 characters";
+    }
+    if (!/^[\w\s]+$/.test(formData.username)) {
+      newErrors.username = "Username cannot contain special characters";
+    }
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    try {
+      if (!validateForm()) return;
+
+      const updatedProfileData = { 
+        ...formData, 
+        profilePicture: croppedImageUrl || profile.profilePicture 
+      };
+
+      setIsUploading(true);
+
+      await updateUser(current_user.user_id, updatedProfileData);
+      toast.success("Profile updated successfully!");
+      localStorage.setItem("user", JSON.stringify(updatedProfileData));
+
+    } catch (error) {
+      toast.error("Failed to save profile");
+      console.error("Failed to save profile:", error);
+    } finally {
+      setIsUploading(false);
+      setIsEditing(false);  // Exit edit mode after saving
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const calculateProfileCompletion = () => {
+    const fields = Object.values(profile).filter(Boolean).length;
+    return (fields / Object.keys(profile).length) * 100;
+  };
+
+  const onImageLoaded = (image) => {};
+
+  const onCropChange = (newCrop) => {
+    setCrop(newCrop);
+  };
+
+  const onCropComplete = (crop) => {
+    if (crop.width && crop.height) {
+      const canvas = document.createElement("canvas");
+      const image = document.createElement("img");
+      image.src = tempImage;
+      image.onload = () => {
+        const ctx = canvas.getContext("2d");
+        canvas.width = crop.width;
+        canvas.height = crop.height;
+        ctx.drawImage(
+          image,
+          crop.x,
+          crop.y,
+          crop.width,
+          crop.height,
+          0,
+          0,
+          crop.width,
+          crop.height
+        );
+        setCroppedImageUrl(canvas.toDataURL());
+      };
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-      <EditProfileModal />
-      
-      {/* Profile Header */}
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-          <div className="flex flex-col sm:flex-row items-center gap-8">
-            <div className="relative group">
-              <img
-                src={userData.profilePic}
-                alt="Profile"
-                className="h-32 w-32 rounded-full object-cover"
-              />
-              <div className="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                <FiEdit2 className="text-white text-xl" />
-              </div>
+    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <div className="p-8">
+          <div className="text-center mb-8">
+            <div className="relative inline-block">
+              {isEditing ? (
+                <div
+                  {...getRootProps()}
+                  className="w-32 h-32 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center cursor-pointer hover:border-blue-500 transition-colors"
+                >
+                  <input {...getInputProps()} />
+                  <FiUpload className="w-8 h-8 text-gray-400" />
+                </div>
+              ) : (
+                <img
+                  src={croppedImageUrl || profile.profilePicture}
+                  alt={profile.username}
+                  className="w-32 h-32 rounded-full object-cover"
+                />
+              )}
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full text-white hover:bg-blue-600 transition-colors"
+                >
+                  <FiEdit2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
-            <div className="text-center sm:text-left">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{userData.username}</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">{userData.email}</p>
-              <button
-                onClick={() => setIsEditModalOpen(true)}
-                className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <FiEdit2 className="mr-2" /> Edit Profile
-              </button>
-            </div>
-          </div>
-        </div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <div className="flex items-center">
-              <FiHelpCircle className="text-blue-500 text-3xl" />
-              <div className="ml-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Problems Submitted</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{userData.stats.problemsSubmitted}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <div className="flex items-center">
-              <FiCheckCircle className="text-green-500 text-3xl" />
-              <div className="ml-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Helpful Votes</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{userData.stats.helpfulVotes}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <div className="flex items-center">
-              <BsLightbulb className="text-yellow-500 text-3xl" />
-              <div className="ml-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Solutions Provided</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{userData.stats.solutionsProvided}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
+            <h2 className="mt-4 text-2xl font-bold text-white">{profile.username}</h2>
+            <div className="mt-2 text-sm text-gray-400">{profile.email}</div>
 
-        {/* Solutions Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">My Solutions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {userData.solutions.map((solution) => (
-              <div key={solution.id} className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{solution.title}</h3>
-                <div className="mt-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span>{solution.date}</span>
-                  <span className={`px-2 py-1 rounded-full ${solution.status === 'Accepted' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>                    {solution.status}
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <FiCheckCircle className="mr-1" /> {solution.votes} helpful votes
-                </div>
-              </div>
-            ))}
+            <div className="mt-4 w-full bg-gray-600 rounded-full h-2.5">
+              <div
+                className="bg-blue-500 h-2.5 rounded-full"
+                style={{ width: `${calculateProfileCompletion()}%` }}
+              ></div>
+            </div>
+            <p className="mt-2 text-sm text-gray-400">
+              Profile Completion: {Math.round(calculateProfileCompletion())}%
+            </p>
           </div>
-        </div>
 
-        {/* Problems Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">My Problems</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {userData.problems.map((problem) => (
-              <div key={problem.id} className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{problem.title}</h3>
-                <div className="mt-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span>{problem.date}</span>
-                  <span className={`px-2 py-1 rounded-full ${problem.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>                    {problem.status}
-                  </span>
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Username</label>
+                <div className="flex items-center space-x-2">
+                  <FiUser className="text-gray-400" />
+                  <input
+                    type="text"
+                    name="username"
+                    disabled={!isEditing}
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  />
                 </div>
-                <div className="mt-2 flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <BsLightbulb className="mr-1" /> {problem.solutions} solutions
-                </div>
+                {errors.username && (
+                  <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+                )}
               </div>
-            ))}
-          </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Email</label>
+                <div className="flex items-center space-x-2">
+                  <FiMail className="text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    disabled={!isEditing}
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              {isEditing ? (
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="w-full sm:w-auto px-6 py-2 mt-4 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600"
+                  disabled={isUploading}
+                >
+                  {isUploading ? "Saving..." : "Save Changes"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="w-full sm:w-auto px-6 py-2 mt-4 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600"
+                >
+                  Edit Profile
+                </button>
+              )}
+            </div>
+          </form>
         </div>
       </div>
+
+      <ToastContainer />
     </div>
   );
 };
 
-export default Profile;
+export default UserProfile;

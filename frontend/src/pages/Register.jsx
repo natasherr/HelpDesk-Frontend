@@ -1,16 +1,15 @@
 import React, { useState, useContext } from 'react';
-// import { useNavigate } from 'react-router-dom';
-import {UserContext} from '../context/UserContext'
+import { useNavigate } from 'react-router-dom'; // Importing useNavigate
+import { UserContext } from '../context/UserContext'; // Import the UserContext
 
 const Register = () => {
-
-  const {addUser} = useContext(UserContext);
-
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  // const navigate = useNavigate();
+
+  const { addUser } = useContext(UserContext); // Access addUser from context
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // To handle form submission
   const handleSubmit = (e) => {
@@ -18,10 +17,15 @@ const Register = () => {
 
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
+      return;
     }
 
-    addUser(username, email, password)
-    console.log({ username, email});
+    // Use the addUser function from the context
+    addUser(username, email, password);
+
+    // After successful registration, navigate to the login page
+    // You can handle the navigation inside the addUser function via a callback or after the registration is successful.
+    navigate('/login');
   };
 
   const handleGitHubLogin = () => {
@@ -37,12 +41,11 @@ const Register = () => {
             <h1 className="text-2xl xl:text-3xl font-extrabold">Sign up</h1>
             <div className="w-full flex-1 mt-8">
               <div className="mx-auto max-w-xs">
-                {/* {error && <div className="text-red-500 text-center">{error}</div>} */}
                 <form onSubmit={handleSubmit}>
                   <input
                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                     type="text"
-                    placeholder="Use a unique name!"
+                    placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -90,7 +93,7 @@ const Register = () => {
                     <span className="ml-3">Sign Up</span>
                   </button>
                 </form>
-                
+
                 {/* GitHub Sign Up Button */}
                 <button
                   className="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5"
@@ -103,7 +106,6 @@ const Register = () => {
                   </div>
                   <span className="ml-4">Sign Up with GitHub</span>
                 </button>
-
               </div>
             </div>
           </div>

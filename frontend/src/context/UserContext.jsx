@@ -1,14 +1,14 @@
-import { createContext, useEffect, useState } from "react"
+import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-export const UserContext = createContext()
-
+export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const navigate = useNavigate();
     const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("token"));
     const [current_user, setCurrentUser] = useState(null);
+    const [users, setUsers] = useState([]);
 
     console.log("Current user:", current_user);
 
@@ -84,9 +84,9 @@ export const UserProvider = ({ children }) => {
     // Fetch current user
     useEffect(() => {
         fetchCurrentUser();
-    }, []);
-    
-    const fetchCurrentUser  = () => {
+    }, [authToken]);
+
+    const fetchCurrentUser = () => {
         console.log("Current user fcn:", authToken);
         fetch('http://127.0.0.1:5000/current_user', {
             method: "GET",
@@ -102,7 +102,7 @@ export const UserProvider = ({ children }) => {
         .then((response) => {
             console.log("Response Data:", response);
             if (response.email) {
-                setCurrentUser (response);
+                setCurrentUser(response);
             }
         })
         .catch((error) => {
@@ -140,17 +140,17 @@ export const UserProvider = ({ children }) => {
     };
 
     // Update User
-    const updateUser = (user_id, updatedData) => {
+    const updateUser = (updatedData) => {
         console.log("Updating user:", updatedData);
         toast.loading("Updating user...");
 
-        fetch(`http://127.0.0.1:5000/users/${user_id}`, {
-            method: "PATCH",
+        fetch("http://127.0.0.1:5000/update_profile", {
+            method: "PUT",  // Changed to PUT for full update
             headers: {
                 'Content-type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify(updatedData)
+            body: JSON.stringify(updatedData) // Send the updated data
         })
         .then((resp) => resp.json())
         .then((response) => {
@@ -168,6 +168,7 @@ export const UserProvider = ({ children }) => {
         });
     };
 
+    // Delete User
     const deleteUser = async (user_id) => {
         console.log("Deleting user:", user_id);
         toast.loading("Deleting user...");
@@ -195,14 +196,42 @@ export const UserProvider = ({ children }) => {
         });
     };
 
+    // Get Users
+    const getUsers = () => {
+        toast.loading("Fetching users...");
+        fetch('http://127.0.0.1:5000/users', {
+            method: "GET",
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            toast.dismiss();
+            if (response.users) {
+                setUsers(response.users);
+                toast.success("Users fetched successfully!");
+            } else {
+                toast.error(response.error || "Failed to fetch users.");
+            }
+        })
+        .catch((error) => {
+            toast.dismiss();
+            toast.error("An error occurred: " + error.message);
+        });
+    };
+
     const data = {
         authToken,
         login,
         logout,
         current_user,
+        users,
         addUser,
         updateUser,
         deleteUser,
+        getUsers,
     };
 
     return (
