@@ -12,9 +12,9 @@ export const HelpDeskProvider = ({children}) =>
 
         const [problem, setProblem] = useState([])
         const [solution, setSolution] = useState([])
-        const [notification, setNotification] = useState([])
-        const [tag, setTag] = useState([])
         const [vote, setVote] = useState([])
+        
+        
 
 
         const [onChange, setOnChange] = useState(true)
@@ -438,15 +438,17 @@ export const HelpDeskProvider = ({children}) =>
             });
     };
 
-    
+
 
         
         const data ={
             problem,
             solution,
-            notification,
-            tag,
             vote,
+           
+
+
+            
             
             getProblemById,
             addProblem,
@@ -471,4 +473,4 @@ export const HelpDeskProvider = ({children}) =>
                 {children}
             </HelpDeskContext.Provider>
         )
-    }
+}

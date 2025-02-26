@@ -14,8 +14,9 @@ import Faqs from "./pages/Faqs";
 import Layout from './components/Layout';
 import NoPage from './pages/NoPage';
 import Notifications from "./pages/Notifications"; 
-import { UserProvider } from './context/UserContext';
-import {HelpDeskProvider} from './context/HelpDeskContext'
+import Tag from './pages/Tag';
+import { HelpProvider } from './context/HelpContext';
+
 
 export default function App() {
   return (
@@ -24,22 +25,28 @@ export default function App() {
       <div className="bg-gray-900 text-white min-h-screen">
         <UserProvider>
           <HelpDeskProvider>
+            <HelpProvider>
 
               <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="login" element={<Login />} />
-                  <Route path="register" element={<Register />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="categories" element={<Categories />} />
-                  <Route path="problems" element={<Problems />} />
-                  <Route path="about" element={<About />} />
-                  <Route path="faqs" element={<Faqs />} />
-                  <Route path="notifications" element={<Notifications />} /> {/* Add Notifications route */}
-                  <Route path="*" element={<NoPage />} /> 
+                <Route>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="register" element={<Register />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="categories" element={<Categories />} />
+                    <Route path="problems" element={<Problems />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="faqs" element={<Faqs />} />
+                    <Route path="notifications" element={<Notifications />} />
+                    <Route path="/tag/:tagId" element={<Tag />} />
+                    <Route path="*" element={<NoPage />} /> 
+                  </Route>
                 </Route>
               </Routes>
+
               
+            </HelpProvider>
           </HelpDeskProvider>    
         </UserProvider>
       </div>

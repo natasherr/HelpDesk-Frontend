@@ -95,19 +95,12 @@ export const UserProvider = ({ children }) => {
                 'Authorization': `Bearer ${authToken}`
             }
         })
+        .then((response) => response.json())
         .then((response) => {
-            console.log("Response Status:", response.status);
-            return response.json();
-        })
-        .then((response) => {
-            console.log("Response Data:", response);
             if (response.email) {
                 setCurrentUser (response);
             }
         })
-        .catch((error) => {
-            console.error("Fetch error:", error);
-        });
     };
 
     // Add User
