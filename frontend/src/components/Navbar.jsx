@@ -1,7 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
+import { useContext } from 'react';
 
 const Navbar = () => {
+
+  const {logout, current_user} = useContext(UserContext)
+
   return (
     <div>
       {/* Section 1 */}
@@ -44,16 +49,23 @@ const Navbar = () => {
 
           <div className="inline-flex items-center ml-5 space-x-6 lg:justify-end">
             <Link
+              to="/register"
+              className="inline-flex items-center justify-center px-4 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600"
+            >
+              Get Started
+            </Link>
+            <Link
               to="/login"
               className="text-base font-medium leading-6 text-gray-400 whitespace-no-wrap transition duration-150 ease-in-out hover:text-white"
             >
               Login
             </Link>
+            
             <Link
-              to="/register"
-              className="inline-flex items-center justify-center px-4 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600"
+            onClick={() => logout()}
+            className="text-base font-medium leading-6 text-gray-400 whitespace-no-wrap transition duration-150 ease-in-out hover:text-white"
             >
-              Get Started
+            Logout
             </Link>
           </div>
         </div>

@@ -14,8 +14,8 @@ import Faqs from "./pages/Faqs";
 import Layout from './components/Layout';
 import NoPage from './pages/NoPage';
 import Notifications from "./pages/Notifications"; 
-import { UserProvider } from './context/UserContext';
-import {HelpDeskProvider} from './context/HelpDeskContext'
+import CloudinaryImage from './components/CloudinaryImage';
+
 
 export default function App() {
   return (
@@ -35,7 +35,8 @@ export default function App() {
                   <Route path="problems" element={<Problems />} />
                   <Route path="about" element={<About />} />
                   <Route path="faqs" element={<Faqs />} />
-                  <Route path="notifications" element={<Notifications />} /> {/* Add Notifications route */}
+                  <Route path="notifications" element={<Notifications />} />
+                  <Route path="cloudinary-image" element={<CloudinaryImage />} />
                   <Route path="*" element={<NoPage />} /> 
                 </Route>
               </Routes>
