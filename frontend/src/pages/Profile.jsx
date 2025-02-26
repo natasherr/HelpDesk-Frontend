@@ -1,57 +1,62 @@
-import { useState } from "react";
-import { FiEdit2, FiHelpCircle, FiCheckCircle, FiArrowRight } from "react-icons/fi";
+import { useState, useContext, useEffect } from "react";
+import { FiEdit2, FiHelpCircle, FiCheckCircle } from "react-icons/fi";
 import { BsLightbulb } from "react-icons/bs";
+import { UserContext } from "../context/UserContext"; 
+import { HelpDeskContext } from "../context/HelpDeskContext";
 
 const Profile = () => {
+  const { current_user, updateUser, deleteUser  } = useContext(UserContext);
+
+  const {problem, solution, vote, getProblemBId, getSolutionByID, voteOnSolution } = useContext(HelpDeskContext)
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [userData, setUserData] = useState({
-    username: "John Developer",
-    email: "john.dev@example.com",
-    profilePic: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9",
+    username: "",
+    email: "",
+    profilePic: "",
     stats: {
-      problemsSubmitted: 24,
-      helpfulVotes: 156,
-      solutionsProvided: 47
+      problemsSubmitted: 0,
+      helpfulVotes: 0,
+      solutionsProvided: 0
     },
-    solutions: [
-      {
-        id: 1,
-        title: "Fixed API Authentication Issue",
-        date: "2024-01-15",
-        votes: 23,
-        status: "Accepted"
-      },
-      {
-        id: 2,
-        title: "Database Optimization Solution",
-        date: "2024-01-10",
-        votes: 15,
-        status: "Pending"
-      }
-    ],
-    problems: [
-      {
-        id: 1,
-        title: "React Performance Issues",
-        date: "2024-01-05",
-        status: "Open",
-        solutions: 3
-      },
-      {
-        id: 2,
-        title: "Authentication Flow Bug",
-        date: "2024-01-01",
-        status: "Resolved",
-        solutions: 5
-      }
-    ]
+    solutions: [],
+    problems: []
   });
 
+  useEffect(() => {
+    if (current_user) {
+      setUserData({
+        username: current_user.username || "",
+        email: current_user.email || "",
+        profilePic: current_user.profilePic || "",
+        stats: {
+          problemsSubmitted: current_user.stats?.problemsSubmitted || 0,
+          helpfulVotes: current_user.stats?.helpfulVotes || 0,
+          solutionsProvided: current_user.stats?.solutionsProvided || 0
+        },
+        solutions: current_user.solutions || [],
+        problems: current_user.problems || []
+      });
+    }
+  }, [current_user]);
+
+  const handleProfileUpdate = (e) => {
+    e.preventDefault();
+    const updatedData = {
+      username: userData.username,
+      email: userData.email,
+      profilePic: userData.profilePic // You can add logic to handle profile picture changes
+    };
+    updateUser (current_user.user_id, updatedData); // Assuming current_user has an id
+    setIsEditModalOpen(false);
+  };
+
+  // Form for editing profile
   const EditProfileModal = () => (
     <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ${isEditModalOpen ? 'block' : 'hidden'}`}>
       <div className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 dark:text-white">Edit Profile</h2>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleProfileUpdate}>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
             <div className="mt-1 flex items-center">
@@ -63,11 +68,21 @@ const Profile = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-            <input type="text" defaultValue={userData.username} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" />
+            <input
+              type="text"
+              value={userData.username}
+              onChange={(e) => setUserData({ ...userData, username: e.target.value })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-            <input type="email" defaultValue={userData.email} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" />
+            <input
+              type="email"
+              value={userData.email}
+              onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+            />
           </div>
           <div className="flex justify-end gap-4 mt-6">
             <button
@@ -104,7 +119,7 @@ const Profile = () => {
                 className="h-32 w-32 rounded-full object-cover"
               />
               <div className="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                <FiEdit2 className="text-white text-xl" />
+                <FiEdit2 className="text-white text-xl" onClick={() => setIsEditModalOpen(true)} />
               </div>
             </div>
             <div className="text-center sm:text-left">
@@ -131,15 +146,7 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <div className="flex items-center">
-              <FiCheckCircle className="text-green-500 text-3xl" />
-              <div className="ml-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Helpful Votes</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{userData.stats.helpfulVotes}</h3>
-              </div>
-            </div>
-          </div>
+          
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <div className="flex items-center">
               <BsLightbulb className="text-yellow-500 text-3xl" />
@@ -156,11 +163,12 @@ const Profile = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">My Solutions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {userData.solutions.map((solution) => (
-              <div key={solution.id} className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div key={solution.solution_id} className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{solution.title}</h3>
                 <div className="mt-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span>{solution.date}</span>
-                  <span className={`px-2 py-1 rounded-full ${solution.status === 'Accepted' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>                    {solution.status}
+                  {/* <span>{solution.date}</span> */}
+                  <span className={`px-2 py-1 rounded-full ${solution.status === 'Accepted' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                    {solution.status}
                   </span>
                 </div>
                 <div className="mt-2 flex items-center text-sm text-gray-600 dark:text-gray-400">
@@ -180,7 +188,8 @@ const Profile = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{problem.title}</h3>
                 <div className="mt-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                   <span>{problem.date}</span>
-                  <span className={`px-2 py-1 rounded-full ${problem.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>                    {problem.status}
+                  <span className={`px-2 py-1 rounded-full ${problem.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+                    {problem.status}
                   </span>
                 </div>
                 <div className="mt-2 flex items-center text-sm text-gray-600 dark:text-gray-400">
