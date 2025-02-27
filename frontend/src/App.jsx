@@ -1,13 +1,12 @@
-// src/App.jsx
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { UserProvider } from "./context/UserContext";  // Import UserProvider
-import { HelpDeskProvider } from "./context/HelpDeskContext";  // Import HelpDeskProvider
+import { UserProvider } from "./context/UserContext";  // Import UserProvider once
+import { HelpDeskProvider } from "./context/HelpDeskContext";  // Import HelpDeskProvider once
 import Home from "./pages/Home";
+import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Categories from "./pages/Categories";
 import Profile from "./pages/Profile";
-import Register from "./pages/Register";
 import About from "./pages/About";
 import Problems from "./pages/Problems";
 import Faqs from "./pages/Faqs";
@@ -19,6 +18,8 @@ import { HelpProvider } from './context/HelpContext';
 import AddSolution from './pages/AddSolution';
 import AddProblem from './pages/AddProblem';
 import SingleProblem from './pages/SingleProblem';
+import CloudinaryImage from './components/CloudinaryImage';
+
 
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
         <UserProvider>
           <HelpDeskProvider>
             <HelpProvider>
+
 
               <Routes>
                 <Route>
@@ -42,10 +44,11 @@ export default function App() {
                     <Route path="about" element={<About />} />
                     <Route path="faqs" element={<Faqs />} />
                     <Route path="notifications" element={<Notifications />} />
-                    <Route path="/tag/:tagId" element={<Tag />} />
+                    <Route path="/t<<<<<<< ft-notificationag/:tagId" element={<Tag />} />
                     <Route path="addsolution" element={<AddSolution/>} />
                     <Route path="addproblem" element={<AddProblem/>} />
                     <Route path="/singleproblem/:id" element={<SingleProblem/>} />
+                    <Route path="cloudinary-image" element={<CloudinaryImage />} />
                     <Route path="*" element={<NoPage />} /> 
                   </Route>
                 </Route>
@@ -56,7 +59,6 @@ export default function App() {
           </HelpDeskProvider>    
         </UserProvider>
       </div>
-
     </BrowserRouter>
   );
 }

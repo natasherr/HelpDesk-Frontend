@@ -3,6 +3,7 @@ import Tag from "./Tag";
 import { Link } from 'react-router-dom';
 import { HelpContext } from "../context/HelpContext";
 
+
 const Categories = () => {
   const { tag } = useContext(HelpContext);
 
@@ -17,6 +18,7 @@ const Categories = () => {
             <h2 className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-3xl sm:text-4xl">
               Help Desk Tags
             </h2>
+
           </div>
 
           <div className="relative mx-auto max-w-7xl z-10 grid grid-cols-1 gap-10 pt-14 sm:grid-cols-2 lg:grid-cols-3">
@@ -79,8 +81,11 @@ const Categories = () => {
           ></div>
         </section>
       </div>
+
     </div>
   );
 };
 
+
 export default Categories;
+
