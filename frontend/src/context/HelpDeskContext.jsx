@@ -21,19 +21,21 @@ export const HelpDeskProvider = ({children}) =>
 
         // ==============================PROBLEM===============================
         // Fetch problems
-        useEffect(()=>{
-            fetch('http://127.0.0.1:5000/problems',{
-                    method:"GET",
-                    headers: {
-                        'Content-type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                })
-                .then((response) => response.json())
-                .then((response) => {
-                setProblem(response)
-                });
-       }, [])
+        useEffect(() => {
+            fetch('http://127.0.0.1:5000/problems', {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${authToken}`
+                }
+            })
+            .then((response) => response.json())
+            .then((response) => {
+                setProblem(response.problems || []); // Ensure we get the list of problems
+            })
+            .catch((error) => console.error("Error fetching problems:", error)); // Handle errors
+        }, [authToken]); // Re-run when authToken changes
+        
 
 
     // Fetch problem by ID
@@ -68,7 +70,7 @@ export const HelpDeskProvider = ({children}) =>
                     method:"POST",
                     headers: {
                         'Content-type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
+                        Authorization : `Bearer ${authToken}`
         
                         },
                     body: JSON.stringify({
@@ -82,7 +84,7 @@ export const HelpDeskProvider = ({children}) =>
                     if(response.success){
                         toast.dismiss()
                         toast.success(response.success)
-                        setOnchange(!onChange)
+                        setOnChange(!onChange)
                     }
                     else if(response.error){
                         toast.dismiss()
@@ -116,7 +118,7 @@ export const HelpDeskProvider = ({children}) =>
                 if (response.message) {
                     toast.dismiss();
                     toast.success(response.message);
-                    setOnchange(!onChange);
+                    setOnChange(!onChange);
                 } else if (response.error) {
                     toast.dismiss();
                     toast.error(response.error);
@@ -145,7 +147,7 @@ export const HelpDeskProvider = ({children}) =>
                     if(response.success){
                         toast.dismiss()
                         toast.success(response.success)
-                        setOnchange(!onChange)
+                        setOnChange(!onChange)
                         navigate("/")
         
                     }
@@ -168,7 +170,7 @@ export const HelpDeskProvider = ({children}) =>
                 method: "GET",
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
+                    Authorization : `Bearer ${authToken}`
                 }
             })
                 .then((response) => response.json())
@@ -208,7 +210,7 @@ export const HelpDeskProvider = ({children}) =>
                 method: "POST",
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
+                    Authorization : `Bearer ${authToken}`
                 },
                 body: JSON.stringify({
                     description, tag_id, problem_id
@@ -237,7 +239,7 @@ export const HelpDeskProvider = ({children}) =>
                 method: "PUT",
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
+                    Authorization : `Bearer ${authToken}`
                 },
                 body: JSON.stringify({
                     description,
@@ -269,7 +271,7 @@ export const HelpDeskProvider = ({children}) =>
                 method: "DELETE",
                 headers: {
                     'Content-type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
+                    Authorization : `Bearer ${authToken}`
                 }
             })
                 .then((resp) => resp.json())
@@ -350,7 +352,7 @@ export const HelpDeskProvider = ({children}) =>
             method: "POST",
             headers: {
                 'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                Authorization : `Bearer ${authToken}`
             },
             body: JSON.stringify({ name })
         })
@@ -366,79 +368,6 @@ export const HelpDeskProvider = ({children}) =>
                 }
             });
     };
-
-    // Update tag
-    const updateTag = (tag_id, name) => {
-        toast.loading("Updating tag...");
-        fetch(`http://127.0.0.1:5000/tags/${tag_id}`, {
-            method: "PUT",
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ name })
-        })
-            .then((resp) => resp.json())
-            .then((response) => {
-                if (response.success) {
-                    toast.dismiss();
-                    toast.success(response.success);
-                    setOnChange(!onChange);
-                } else if (response.error) {
-                    toast.dismiss();
-                    toast.error(response.error);
-                }
-            });
-    };
-
-    // Delete tag
-    const deleteTag = (tag_id) => {
-        toast.loading("Deleting tag...");
-        fetch(`http://127.0.0.1:5000/tags/${tag_id}`, {
-            method: "DELETE",
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            }
-        })
-            .then((resp) => resp.json())
-            .then((response) => {
-                if (response.success) {
-                    toast.dismiss();
-                    toast.success(response.success);
-                    setOnChange(!onChange);
-                } else if (response.error) {
-                    toast.dismiss();
-                    toast.error(response.error);
-                }
-            });
-    };
-
-    // Fetch tag by ID
-    const getTagById = (tag_id) => {
-        return fetch(`http://127.0.0.1:5000/tags/${tag_id}`, {
-            method: "GET",
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            }
-        })
-            .then((resp) => resp.json())
-            .then((response) => {
-                if (response.error) {
-                    toast.error(response.error);
-                    return null;
-                }
-                return response;
-            })
-            .catch((error) => {
-                toast.error("Failed to fetch tag.");
-                console.error(error);
-                return null;
-            });
-    };
-
-
 
         
         const data ={
@@ -462,10 +391,7 @@ export const HelpDeskProvider = ({children}) =>
 
             voteOnSolution,
             deleteVote,
-            addTag,
-            updateTag,
-            deleteTag,
-            getTagById
+            addTag
             
         }
         return(

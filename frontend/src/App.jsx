@@ -16,6 +16,9 @@ import NoPage from './pages/NoPage';
 import Notifications from "./pages/Notifications"; 
 import Tag from './pages/Tag';
 import { HelpProvider } from './context/HelpContext';
+import AddSolution from './pages/AddSolution';
+import AddProblem from './pages/AddProblem';
+import SingleProblem from './pages/SingleProblem';
 
 
 export default function App() {
@@ -40,6 +43,9 @@ export default function App() {
                     <Route path="faqs" element={<Faqs />} />
                     <Route path="notifications" element={<Notifications />} />
                     <Route path="/tag/:tagId" element={<Tag />} />
+                    <Route path="addsolution" element={<AddSolution/>} />
+                    <Route path="addproblem" element={<AddProblem/>} />
+                    <Route path="/singleproblem/:id" element={<SingleProblem/>} />
                     <Route path="*" element={<NoPage />} /> 
                   </Route>
                 </Route>

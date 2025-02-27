@@ -44,7 +44,12 @@ const Navbar = () => {
                     <Link to="/categories" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
                       Categories
                     </Link>
-
+                    <Link to="/addproblem" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      AddProblem
+                    </Link>
+                    <Link to="/addsolution" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      AddSolution
+                    </Link>
                   </nav>
 
                 </>
