@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
-import { useContext } from 'react';
+
+
 
 const Navbar = () => {
-
   const {logout, current_user} = useContext(UserContext)
 
   return (
@@ -21,31 +21,42 @@ const Navbar = () => {
                 HelpDesk<span className="text-indigo-600">.</span>
               </span>
             </Link>
-            <nav className="flex flex-wrap items-center mb-5 text-base md:mb-0 md:pl-8 md:ml-8 md:border-l md:border-gray-700">
-              <Link to="/" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
-                Home
-              </Link>
-              <Link to="/profile" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
-                Profile
-              </Link>
-              <Link to="/problems" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
-                Problems
-              </Link>
-              <Link to="/faqs" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
-                FAQs
-              </Link>
-              <Link to="/about" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
-                About
-              </Link>
-              <Link to="/notifications" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
-                Notifications
-              </Link>
-              <Link to="/categories" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
-                Categories
-              </Link>
+            {
+              current_user ? (
+                <>
+                  <nav className="flex flex-wrap items-center mb-5 text-base md:mb-0 md:pl-8 md:ml-8 md:border-l md:border-gray-700">
+                    <Link to="/" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      Home
+                    </Link>
+                    <Link to="/profile" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      Profile
+                    </Link>
+                    <Link to="/problems" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      Problems
+                    </Link>
+                    <Link to="/faqs" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      FAQs
+                    </Link>
+                    <Link to="/about" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      About
+                    </Link>
+                    <Link to="/notifications" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      Notifications
+                    </Link>
+                    <Link to="/categories" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      Categories
+                    </Link>
+                    <Link to="/addproblem" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      AddProblem
+                    </Link>
+                    <Link to="/addsolution" className="mr-5 font-medium leading-6 text-gray-400 hover:text-white">
+                      AddSolution
+                    </Link>
+                  </nav>
 
-            </nav>
-          </div>
+                </>
+              ):(
+
 
           <div className="inline-flex items-center ml-5 space-x-6 lg:justify-end">
             <Link

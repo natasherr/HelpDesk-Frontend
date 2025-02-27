@@ -1,3 +1,4 @@
+
 import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
@@ -10,19 +11,23 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  // To handle form submission
+
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     login(email, password);
 
+
     // Add login functionality here
     // navigate('/'); // for example, after successful login
+
   };
 
   // Redirect if the user is already logged in
   useEffect(() => {
     if (current_user) {
-      navigate('/profile'); // Redirect to profile page after successful login
+      navigate('/');
+
     }
   }, [current_user, navigate]);
 
@@ -42,13 +47,15 @@ const Login = () => {
   return (
     <div className="font-[sans-serif] max-sm:px-4">
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <div className="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
+        <div className="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 m-4 shadow-md rounded-md">
           <div className="md:max-w-md w-full px-4 py-4">
             <form onSubmit={handleSubmit}>
               <div className="mb-12">
+
                 <h3 className="text-white-800 text-3xl font-extrabold">Sign in</h3>
                 <p className="text-sm mt-4 text-white-800">
                   Don't have an account?{' '}
+
                   <Link to="/register" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">
                     Register Here
                   </Link>
@@ -56,11 +63,11 @@ const Login = () => {
               </div>
 
               <div>
-                <label className="text-white-800 text-xs block mb-2">Email</label>
+                <label className="text-gray-800 text-xs block mb-2">Email</label>
                 <div className="relative flex items-center">
                   <input
                     name="email"
-                    type="text"
+                    type="email"
                     required
                     className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none rounded-md"
                     placeholder="user@domain.com"
@@ -71,7 +78,7 @@ const Login = () => {
               </div>
 
               <div className="mt-8">
-                <label className="text-white-800 text-xs block mb-2">Password</label>
+                <label className="text-gray-800 text-xs block mb-2">Password</label>
                 <div className="relative flex items-center">
                   <input
                     name="password"
@@ -82,11 +89,11 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
+
                 
                 <div>
                   <a href="javascript:void(0);" className="text-blue-600 font-semibold text-sm hover:underline">Forgot Password?</a>
@@ -116,6 +123,7 @@ const Login = () => {
                 }}
                 useOneTap
               />
+
             </form>
           </div>
 

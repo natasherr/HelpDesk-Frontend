@@ -13,8 +13,13 @@ import Faqs from "./pages/Faqs";
 import Layout from './components/Layout';
 import NoPage from './pages/NoPage';
 import Notifications from "./pages/Notifications"; 
-
+import Tag from './pages/Tag';
+import { HelpProvider } from './context/HelpContext';
+import AddSolution from './pages/AddSolution';
+import AddProblem from './pages/AddProblem';
+import SingleProblem from './pages/SingleProblem';
 import CloudinaryImage from './components/CloudinaryImage';
+
 
 
 export default function App() {
@@ -24,24 +29,33 @@ export default function App() {
       <div className="bg-gray-900 text-white min-h-screen">
         <UserProvider>
           <HelpDeskProvider>
+            <HelpProvider>
 
 
               <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="login" element={<Login />} />
-                  <Route path="register" element={<Register />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="categories" element={<Categories />} />
-                  <Route path="problems" element={<Problems />} />
-                  <Route path="about" element={<About />} />
-                  <Route path="faqs" element={<Faqs />} />
-                  <Route path="notifications" element={<Notifications />} />
-                  <Route path="cloudinary-image" element={<CloudinaryImage />} />
-                  <Route path="*" element={<NoPage />} /> 
+                <Route>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="register" element={<Register />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="categories" element={<Categories />} />
+                    <Route path="problems" element={<Problems />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="faqs" element={<Faqs />} />
+                    <Route path="notifications" element={<Notifications />} />
+                    <Route path="/t<<<<<<< ft-notificationag/:tagId" element={<Tag />} />
+                    <Route path="addsolution" element={<AddSolution/>} />
+                    <Route path="addproblem" element={<AddProblem/>} />
+                    <Route path="/singleproblem/:id" element={<SingleProblem/>} />
+                    <Route path="cloudinary-image" element={<CloudinaryImage />} />
+                    <Route path="*" element={<NoPage />} /> 
+                  </Route>
                 </Route>
               </Routes>
+
               
+            </HelpProvider>
           </HelpDeskProvider>    
         </UserProvider>
       </div>
