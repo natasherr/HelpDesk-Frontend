@@ -12,7 +12,7 @@ export const HelpDeskProvider = ({children}) =>
 
         const [problem, setProblem] = useState([])
         const [solution, setSolution] = useState([])
-        const [vote, setVote] = useState([])
+        
         
         
 
@@ -96,7 +96,8 @@ export const HelpDeskProvider = ({children}) =>
                     } 
                 })
             }
-        
+
+            
         // Update Problem
         const updateProblem = (problem_id,description, tag_id) => {
             toast.loading("Updating your Problem... ");
@@ -290,60 +291,6 @@ export const HelpDeskProvider = ({children}) =>
                 });
         };
 
-        // ==============================VOTING===============================
-    // Create or update vote
-    const voteOnSolution = (solution_id, vote_type) => {
-        toast.loading("Recording your vote...");
-        fetch(`http://127.0.0.1:5000/solutions/${solution_id}/vote`, {
-            method: "POST",
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ vote_type })
-        })
-            .then((resp) => resp.json())
-            .then((response) => {
-                if (response.message) {
-                    toast.dismiss();
-                    toast.success(response.message);
-                    setOnChange(!onChange);
-                } else if (response.error) {
-                    toast.dismiss();
-                    toast.error(response.error);
-                } else {
-                    toast.dismiss();
-                    toast.error("Failed to record your vote.");
-                }
-            });
-    };
-
-    // Delete vote
-    const deleteVote = (vote_id) => {
-        toast.loading("Deleting your vote...");
-        fetch(`http://127.0.0.1:5000/solutions/${vote_id}/vote`, {
-            method: "DELETE",
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            }
-        })
-            .then((resp) => resp.json())
-            .then((response) => {
-                if (response.success) {
-                    toast.dismiss();
-                    toast.success(response.success);
-                    setOnChange(!onChange);
-                } else if (response.error) {
-                    toast.dismiss();
-                    toast.error(response.error);
-                } else {
-                    toast.dismiss();
-                    toast.error("Failed to delete your vote.");
-                }
-            });
-    };
-
 
     // Add tag
     const addTag = (name) => {
@@ -369,11 +316,13 @@ export const HelpDeskProvider = ({children}) =>
             });
     };
 
+    
+
         
         const data ={
             problem,
             solution,
-            vote,
+            
            
 
 
@@ -389,9 +338,9 @@ export const HelpDeskProvider = ({children}) =>
             updateSolution,
             deleteSolution,
 
-            voteOnSolution,
-            deleteVote,
-            addTag
+            
+            addTag,
+            
             
         }
         return(
