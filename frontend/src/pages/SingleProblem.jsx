@@ -53,7 +53,7 @@ const SingleProblem = () => {
         setShowSolutionForm(false);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmitSolution = (e) => {
         e.preventDefault();
         if (!description || !tagId) {
             alert("Please fill in all fields");
@@ -62,7 +62,7 @@ const SingleProblem = () => {
         addSolution(description, tagId, singleProblem.id);
         setDescription("");
         setTagId("");
-        setShowForm(false);
+        setShowAddSolutionForm(false);
     };
 
 
@@ -111,8 +111,8 @@ const SingleProblem = () => {
                                 >
                                     Unsubscribe
                                 </button>
-                                <button onClick={() => setShowAddSolutionForm(!showAddSolutionForm)} className="bg-blue-500 text-white px-3 py-1 rounded-lg ml-3">
-                                    {showAddSolutionForm ? "Cancel" : "Add Solution"}
+                                <button onClick={() => setShowAddSolutionForm(true)} className="bg-blue-500 text-white px-3 py-1 rounded-lg ml-3">
+                                    Add Solution
                                 </button>
                                 
                                 <hr className="mt-6 mb-6 border-t-2 border-gray-400" />
@@ -219,31 +219,33 @@ const SingleProblem = () => {
 
             {/* Add solution Form */}
             {showAddSolutionForm && (
-                <form onSubmit={handleSubmit} className="mt-4 border p-4 rounded">
-                    <textarea
-                        className="w-full p-2 border rounded"
-                        placeholder="Describe your solution..."
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                    <select
-                        id="tag"
-                        className="bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={tagId}
-                        onChange={(e) => setTagId(e.target.value)} // Update the tagId for solution
-                        required
-                    >
-                        <option value="">Select a tag</option>
-                        {tag && tag.map((tags) => (
-                            <option key={tags.id} value={tags.id}>
-                                {tags.name}
-                            </option>
-                        ))}
-                    </select>
-                    <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded mt-2">
-                        Submit Solution
-                    </button>
-                </form>
+                <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg w-1/3">
+                        <h2 className="text-xl font-semibold mb-4 text-gray-700">Add Solution</h2>
+                        <textarea
+                            className="w-full p-2 border rounded text-gray-700"
+                            placeholder="Describe your solution..."
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                        <select
+                            id="tag"
+                            className="bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            value={tagId}
+                            onChange={(e) => setTagId(e.target.value)}
+                            required
+                        >
+                            <option value="">Select a tag</option>
+                            {tag && tag.map((tags) => (
+                                <option key={tags.id} value={tags.id}>{tags.name}</option>
+                            ))}
+                        </select>
+                        <div className="flex justify-end space-x-4 mt-3">
+                            <button onClick={handleSubmitSolution} className="bg-green-600 text-white px-4 py-2 rounded">Submit</button>
+                            <button onClick={() => setShowAddSolutionForm(false)} className="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+                        </div>
+                    </div>
+                </div>
             )}
 
         </div>
