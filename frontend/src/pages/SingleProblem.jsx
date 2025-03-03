@@ -2,12 +2,14 @@ import React, { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { HelpDeskContext } from "../context/HelpDeskContext";
 import { HelpContext } from "../context/HelpContext";
+import { UserContext } from "../context/UserContext";
 
 
 const SingleProblem = () => {
     const { id } = useParams();
-    const { problem, deleteProblem, updateProblem, updateSolution, deleteSolution,addSolution } = useContext(HelpDeskContext);
-    const { tag,votes, voteOnSolution, fetchVoteCounts,addSubscribe,deleteSubscription } = useContext(HelpContext);
+    const { problem, deleteProblem, updateProblem, updateSolution, deleteSolution,addSolution,votes, voteOnSolution, fetchAllVotes } = useContext(HelpDeskContext);
+    const { tag,addSubscribe,deleteSubscription } = useContext(HelpContext);
+    const {current_user} = useContext(UserContext)
     
     
     const [showForm, setShowForm] = useState(false);
@@ -68,9 +70,9 @@ const SingleProblem = () => {
 
     useEffect(() => {
         if (singleProblem?.solutions.length > 0) {
-            singleProblem.solutions.forEach((sol) => fetchVoteCounts(sol.id));
+            singleProblem.solutions.forEach((sol) => fetchAllVotes(sol.id));
         }
-    }, [singleProblem, fetchVoteCounts]);
+    }, [singleProblem]);
     
     const handleVote = (solution_id, vote_type) => {
         voteOnSolution(solution_id, vote_type);
@@ -94,11 +96,29 @@ const SingleProblem = () => {
                         {singleProblem ? (
                             <div className="p-10 lg:p-16 bg-gray-200 lg:w-2/3">
                                 <h2 className="text-5xl font-bold text-gray-800">{singleProblem.description}</h2>
+                                {Array.isArray(singleProblem?.tag) ? (
+                                    singleProblem.tag.map((nam) => (
+                                        <span key={nam.id} className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                            {nam.name}
+                                        </span>
+                                    ))
+                                ) : (
+                                    singleProblem?.tag && (
+                                        <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                            {singleProblem.tag.name}
+                                        </span>
+                                    )
+                                )}
 
                                 <hr className="mt-6 mb-6 border-t-2 border-gray-400" />
+                                {/* show buttons only if the logged-in user is the one who posted the problem */}
 
-                                <button onClick={handleEdit} className="bg-green-600 text-white px-3 py-1 rounded-lg ml-3">Edit</button>
-                                <button onClick={() => deleteProblem(singleProblem.id)} className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3">Delete</button>
+                                {singleProblem?.user?.id === current_user?.id && (
+                                    <>
+                                        <button onClick={handleEdit} className="bg-green-600 text-white px-3 py-1 rounded-lg ml-3">Edit</button>
+                                        <button onClick={() => deleteProblem(singleProblem.id)} className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3">Delete</button>
+                                    </>
+                                    )}
                                 <button
                                     onClick={() => addSubscribe(singleProblem.id)}
                                     className="bg-blue-600 text-white px-3 py-1 rounded-lg ml-3"
@@ -123,11 +143,25 @@ const SingleProblem = () => {
                                         {singleProblem?.solutions.map((sol) => (
                                             <div key={sol.id} className="mt-4">
                                                 <p className="text-lg text-gray-700">{sol.description}</p>
+                                                {sol?.tag &&(
+                                                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                                        {sol.tag.name}
+                                                    </span>
+                                                )}
 
                                                 <hr className="mt-6 mb-6 border-t-2 border-gray-400" />
 
-                                                <button onClick={() => handleEditSolution(sol)} className="bg-yellow-600 text-white px-2 py-1 rounded mt-2">Edit</button>
-                                                <button onClick={() => deleteSolution(sol.id)} className="bg-red-600 text-white px-2 py-1 rounded mt-2 ml-3">Delete</button>
+                                                {/* Show edit & delete buttons only for the solution's owner */}
+                                                {sol.user?.id === current_user?.id && (
+                                                    <>
+                                                        <button onClick={() => handleEditSolution(sol)} className="bg-yellow-600 text-white px-2 py-1 rounded mt-2">
+                                                        Edit
+                                                        </button>
+                                                        <button onClick={() => deleteSolution(sol.id)} className="bg-red-600 text-white px-2 py-1 rounded mt-2 ml-3">
+                                                        Delete
+                                                        </button>
+                                                    </>
+                                                )}
                                                 <button onClick={() => handleVote(sol.id, 1)}>
                                                     👍 {votes[sol.id]?.likes !== undefined ? votes[sol.id].likes : 0}
                                                 </button>

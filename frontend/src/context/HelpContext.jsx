@@ -16,6 +16,9 @@ export const HelpProvider = ({children}) =>
         const [solutionbytag, setSolutionByTag] = useState([]);
         const [votes, setVotes] = useState({});
         const [subscribe, setSubscribe] = useState({});
+        const [Problembytag, setProblemByTag] = useState([]);
+        const [unreadCount, setUnreadCount] = useState(0);
+
 
 
 
@@ -68,9 +71,70 @@ export const HelpProvider = ({children}) =>
                     console.error("Delete Notification Error:", error);
                 });
             };
-        
-        
-        
+
+            // ===> Mark as read
+            const markAsRead = (notification_id) => {
+                toast.loading("marking as Read ...");
+                fetch(`http://127.0.0.1:5000/notifications/${notification_id}/marks`,{
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                })
+                .then((resp) => resp.json())
+                .then((response) =>{
+                    toast.dismiss();
+                    
+                    if (response.message) {
+                        toast.success(response.message); // ✅ Corrected line
+                        setOnChange(!onChange);
+                    }
+                    else if (response.error){
+                        toast.error(response.error);
+                    }
+                    else {
+                        toast.error("Failed to mark as read");
+                    }
+                })
+                .catch((error) => {
+                    toast.dismiss();
+                    toast.error("An error occurred while marking as read");
+                    console.error("Error:", error);
+                });
+            };
+            
+
+
+            // ====>fetch count notification
+            useEffect(() => {
+                if (!authToken) {
+                    console.warn("No auth token available.");
+                    return;
+                }
+            
+                fetch("http://127.0.0.1:5000/notifications/unread", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                })
+                .then((resp) => {
+                    if (!resp.ok) {
+                        throw new Error(`HTTP error! Status: ${resp.status}`);
+                    }
+                    return resp.json();
+                })
+                .then((response) => {
+                    setUnreadCount(response.unread_notifications || 0); // Extract count
+                })
+                .catch((error) => {
+                    console.error("Error fetching unread notifications:", error);
+                });
+            }, [authToken]); 
+            
+
         
             // =======================TAG======================
             useEffect(() => {
@@ -121,13 +185,39 @@ export const HelpProvider = ({children}) =>
                     setSolutionByTag([]);
                 });
             };
+
+
+            // fetching problems based on a tag
+            const fetchProblemByTag = (tagId) => {
+                fetch(`http://127.0.0.1:5000/tags/${tagId}/problems`,{
+                    method: "GET",
+                    headers:{
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${authToken}`,
+                    }
+                })
+                .then((resp) => resp.json())
+                .then((response) => {
+                    console.log(response);
+
+                    if (response.error){
+                        toast.error(response.error || "Failed to fetch solutions");
+                        return;
+                    }
+
+                    if (Array.isArray(response)) {
+                        setProblemByTag(response);
+                    } else {
+                        console.error("Unexpected response format", response);
+                        setProblemByTag([]);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Fetch eorror:", error);
+                    setProblemByTag([])
+                })
+            }
             
-
-
-
-
-
-
 
             // ================= FAQS==============
             useEffect(() => {
@@ -143,63 +233,6 @@ export const HelpProvider = ({children}) =>
                     setFaqs(response);
                 });
             }, [onChange]);
-
-
-
-
-        // ================Votes==================
-        // Function to like/dislike a solution
-        const voteOnSolution = (solution_id, vote_type) => {
-            toast.loading("Recording your vote...");
-        
-            fetch(`http://127.0.0.1:5000/solutions/${solution_id}/vote`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                },
-                body: JSON.stringify({ vote_type })
-            })
-            .then((resp) => resp.json())
-            .then((response) => {
-                toast.dismiss();
-                
-                if (response.message) {
-                    toast.success(response.message);
-                    setOnChange(prev => !prev);  // Trigger UI update
-                } else {
-                    toast.error("Failed to record your vote.");
-                }
-            })
-            .catch((error) => {
-                toast.dismiss();
-                console.error("Error voting on solution:", error);
-                toast.error("An error occurred while voting.");
-            });
-        };
-        
-
-
-        // Function to fetch vote counts for a solution
-        const fetchVoteCounts = (solution_id) => {
-            fetch(`http://127.0.0.1:5000/solutions/${solution_id}/voted`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authToken}`,
-                },
-            })
-            .then((resp) => resp.json())
-            .then((data) => {
-                if (data) {
-                    setVotes((prevVotes) => ({
-                        ...prevVotes,
-                        [solution_id]: data,  // Ensure state is updated correctly
-                    }));
-                }
-            })
-            .catch((error) => console.error("Error fetching votes:", error));
-        };
 
 
 
@@ -279,13 +312,18 @@ export const HelpProvider = ({children}) =>
                 tag,
                 solutionbytag,
                 votes,
+                Problembytag,
+                unreadCount,
+
+
+                markAsRead,
 
 
                 deleteNotification,
                 fetchSolutionByTag,
+                fetchProblemByTag,
 
-                voteOnSolution,
-                fetchVoteCounts,
+                
 
                 addSubscribe,
                 deleteSubscription

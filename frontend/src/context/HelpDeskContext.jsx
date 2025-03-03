@@ -12,6 +12,7 @@ export const HelpDeskProvider = ({children}) =>
 
         const [problem, setProblem] = useState([])
         const [solution, setSolution] = useState([])
+        const [votes, setVotes] = useState({});
         
         
         
@@ -22,19 +23,22 @@ export const HelpDeskProvider = ({children}) =>
         // ==============================PROBLEM===============================
         // Fetch problems
         useEffect(() => {
-            fetch('http://127.0.0.1:5000/problems', {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${authToken}`
-                }
-            })
-            .then((response) => response.json())
-            .then((response) => {
-                setProblem(response.problems || []); // Ensure we get the list of problems
-            })
-            .catch((error) => console.error("Error fetching problems:", error)); // Handle errors
-        }, [authToken]); // Re-run when authToken changes
+            if (authToken) {
+               fetch('http://127.0.0.1:5000/problems', {
+                   method: "GET",
+                   headers: {
+                       'Content-Type': 'application/json',
+                       Authorization: `Bearer ${authToken}`
+                   }
+               })
+               .then((response) => response.json())
+               .then((response) => {
+                   setProblem(response.problems || []); // Ensure we get the list of problems
+               })
+               .catch((error) => console.error("Error fetching problems:", error));
+            }
+         }, [authToken]); // Re-run when authToken changes
+         
         
 
 
@@ -85,6 +89,7 @@ export const HelpDeskProvider = ({children}) =>
                         toast.dismiss()
                         toast.success(response.success)
                         setOnChange(!onChange)
+                        navigate("/problems");
                     }
                     else if(response.error){
                         toast.dismiss()
@@ -167,18 +172,29 @@ export const HelpDeskProvider = ({children}) =>
         // =====================================SOLUTION==============================
         // Fetch Solution
         useEffect(() => {
+            if (!authToken) return; // Prevent fetch if authToken is missing
+        
             fetch('http://127.0.0.1:5000/solutions', {
                 method: "GET",
                 headers: {
-                    'Content-type': 'application/json',
-                    Authorization : `Bearer ${authToken}`
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
                 }
             })
-                .then((response) => response.json())
-                .then((response) => {
-                    setSolution(response.solutions);
-                });
-        }, [])
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setSolution(data.solutions);
+            })
+            .catch((error) => {
+                console.error("Error fetching solutions:", error);
+            });
+        }, [authToken]); // Add `authToken` as a dependency
+        
 
         // Fetch solution by ID
         const getSolutionByID = (solution_id) => {
@@ -223,6 +239,7 @@ export const HelpDeskProvider = ({children}) =>
                         toast.dismiss();
                         toast.success(response.message);
                         setOnChange(!onChange);
+                        navigate("/problems")
                     } else if (response.error) {
                         toast.dismiss();
                         toast.error(response.error);
@@ -271,26 +288,26 @@ export const HelpDeskProvider = ({children}) =>
             fetch(`http://127.0.0.1:5000/solutions/${solution_id}`, {
                 method: "DELETE",
                 headers: {
-                    'Content-type': 'application/json',
-                    Authorization : `Bearer ${authToken}`
+                    Authorization: `Bearer ${authToken}`
                 }
             })
-                .then((resp) => resp.json())
-                .then((response) => {
-                    if (response.success) {
-                        toast.dismiss();
-                        toast.success(response.success);
-                        setOnChange(!onChange);
-                    } else if (response.error) {
-                        toast.dismiss();
-                        toast.error(response.error);
-                    } else {
-                        toast.dismiss();
-                        toast.success("Solution deleted successfully");
-                    }
-                });
+            .then((resp) => resp.json())
+            .then((response) => {
+                toast.dismiss();
+                if (response.success) {
+                    toast.success(response.success);
+                    setOnChange(!onChange);
+                } else {
+                    toast.error(response.error || "Failed to delete solution");
+                }
+            })
+            .catch((error) => {
+                toast.dismiss();
+                toast.error("Failed to delete solution");
+                console.error("Delete Error:", error);
+            });
         };
-
+        
 
     // Add tag
     const addTag = (name) => {
@@ -316,17 +333,118 @@ export const HelpDeskProvider = ({children}) =>
             });
     };
 
+
+
+
+    // ================Votes==================
+        // Function to like/dislike a solution
+        const voteOnSolution = (solution_id, vote_type) => {
+            toast.loading("Recording your vote...");
+        
+            fetch(`http://127.0.0.1:5000/solutions/${solution_id}/vote`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ vote_type })
+            })
+            .then((resp) => resp.json())
+            .then((response) => {
+                toast.dismiss();
+                
+                if (response.message) {
+                    toast.success(response.message);
+                    setOnChange(prev => !prev);  // Trigger UI update
+                } else {
+                    toast.error("Failed to record your vote.");
+                }
+            })
+            .catch((error) => {
+                toast.dismiss();
+                console.error("Error voting on solution:", error);
+                toast.error("An error occurred while voting.");
+            });
+        };
+        
+
+
+        // Function to fetch vote counts for a solution
+        const fetchAllVotes = async () => {
+            if (!solution || solution.length === 0) return;
+        
+            try {
+                const voteRequests = solution.map((sol) =>
+                    fetch(`http://127.0.0.1:5000/solutions/${sol.id}/votes`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${authToken}`,
+                        },
+                    }).then((res) => res.json())
+                );
+        
+                const votesData = await Promise.all(voteRequests);
+        
+                // Convert array to object { solutionId: voteData }
+                const votesObject = solution.reduce((acc, sol, index) => {
+                    acc[sol.id] = votesData[index];
+                    return acc;
+                }, {});
+        
+                setVotes(votesObject);
+            } catch (error) {
+                console.error("Error fetching votes:", error);
+            }
+        };
+        
+        useEffect(() => {
+            fetchAllVotes();
+        }, [solution]); // ✅ Runs only when `solution` changes
+        // useEffect(() => {
+        //     if (authToken && solutionId) {
+        //         fetch(`http://127.0.0.1:5000/solutions/${solutionId}/votes`, {
+        //             method: "GET",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 Authorization: `Bearer ${authToken}`,
+        //             },
+        //         })
+        //         .then((resp) => resp.json())
+        //         .then((response) => {
+        //             if (response.solution_id) {  // Ensure response is valid
+        //                 setVotes({ 
+        //                     likes: response.likes, 
+        //                     dislikes: response.dislikes 
+        //                 });
+        //             } else {
+        //                 setVotes({ likes: 0, dislikes: 0 }); // Default values
+        //             }
+        //         })
+        //         .catch((error) => console.error("Error fetching votes:", error));
+        //     }
+        // }, [authToken,solutionId]);  // Added solution_id as a dependency
+        
+        
+        
+
+
+
+
+
     
 
         
         const data ={
             problem,
             solution,
+            votes,
             
            
 
 
-            
+            fetchAllVotes,
+            voteOnSolution,
             
             getProblemById,
             addProblem,

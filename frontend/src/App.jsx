@@ -15,10 +15,11 @@ import NoPage from './pages/NoPage';
 import Notifications from "./pages/Notifications"; 
 import Tag from './pages/Tag';
 import { HelpProvider } from './context/HelpContext';
-import AddSolution from './pages/AddSolution';
 import AddProblem from './pages/AddProblem';
 import SingleProblem from './pages/SingleProblem';
 import CloudinaryImage from './components/CloudinaryImage';
+import NotiSolution from './pages/NotiSolution';
+import TagProblem from './pages/TagProblem';
 
 
 
@@ -47,8 +48,9 @@ export default function App() {
                     <Route path="about" element={<About />} />
                     <Route path="faqs" element={<Faqs />} />
                     <Route path="notifications" element={<Notifications />} />
-                    <Route path="/t<<<<<<< ft-notificationag/:tagId" element={<Tag />} />
-                    <Route path="addsolution" element={<AddSolution/>} />
+                    <Route path="/tag/:tagId" element={<Tag />} />
+                    <Route path="/tagproblem/:tagId" element={<TagProblem />} />
+                    <Route path="/solutions/:notificationId" element={<NotiSolution />} />
                     <Route path="addproblem" element={<AddProblem/>} />
                     <Route path="/singleproblem/:id" element={<SingleProblem/>} />
                     <Route path="cloudinary-image" element={<CloudinaryImage />} />
