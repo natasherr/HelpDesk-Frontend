@@ -13,6 +13,7 @@ export const HelpDeskProvider = ({children}) =>
         const [problem, setProblem] = useState([])
         const [solution, setSolution] = useState([])
         const [votes, setVotes] = useState({});
+        const [subscriptionStatus, setSubscriptionStatus] = useState({});
         
         
         
@@ -169,6 +170,39 @@ export const HelpDeskProvider = ({children}) =>
                     }    
                 })
             }
+
+
+        // fetching subscription status
+        const subscripStatus = async (problem_id) => {
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/subscription-status/${problem_id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`,
+                    },
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                setSubscriptionStatus(prev => ({
+                    ...prev,
+                    [problem_id]: data.subscribed, // Store status for each problem ID
+                }));
+                
+            } catch (error) {
+                toast.error("Failed to fetch subscription status.");
+                console.error("Fetch error:", error);
+            }
+        };
+    
+        
+
+
+
         // =====================================SOLUTION==============================
         // Fetch Solution
         useEffect(() => {
@@ -401,44 +435,14 @@ export const HelpDeskProvider = ({children}) =>
         useEffect(() => {
             fetchAllVotes();
         }, [solution]); // ✅ Runs only when `solution` changes
-        // useEffect(() => {
-        //     if (authToken && solutionId) {
-        //         fetch(`http://127.0.0.1:5000/solutions/${solutionId}/votes`, {
-        //             method: "GET",
-        //             headers: {
-        //                 "Content-Type": "application/json",
-        //                 Authorization: `Bearer ${authToken}`,
-        //             },
-        //         })
-        //         .then((resp) => resp.json())
-        //         .then((response) => {
-        //             if (response.solution_id) {  // Ensure response is valid
-        //                 setVotes({ 
-        //                     likes: response.likes, 
-        //                     dislikes: response.dislikes 
-        //                 });
-        //             } else {
-        //                 setVotes({ likes: 0, dislikes: 0 }); // Default values
-        //             }
-        //         })
-        //         .catch((error) => console.error("Error fetching votes:", error));
-        //     }
-        // }, [authToken,solutionId]);  // Added solution_id as a dependency
         
-        
-        
-
-
-
-
-
-    
 
         
         const data ={
             problem,
             solution,
             votes,
+            subscriptionStatus,
             
            
 
@@ -458,6 +462,8 @@ export const HelpDeskProvider = ({children}) =>
 
             
             addTag,
+
+            subscripStatus,
             
             
         }

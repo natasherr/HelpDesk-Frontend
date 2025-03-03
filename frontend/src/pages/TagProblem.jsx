@@ -28,6 +28,7 @@ const TagProblem = () => {
                                         <li key={problem.id} className="rounded-xl bg-white px-6 py-8 shadow-sm">
                                             <img src="https://www.svgrepo.com/show/530438/ddos-protection.svg" alt="Solution Icon" className="mx-auto h-10 w-10"/>
                                             <h3 className="my-3 font-display font-medium">{problem.description}</h3>
+                                            <hr className="mt-6 mb-6 border-t-2 border-gray-400" />
                                             <p className="mt-1.5 text-sm leading-6 text-secondary-500">
                                                 {problem.solutions.length > 0 ? (
                                                     problem.solutions.map((sol) => (

@@ -7,7 +7,7 @@ import { UserContext } from "../context/UserContext";
 
 const SingleProblem = () => {
     const { id } = useParams();
-    const { problem, deleteProblem, updateProblem, updateSolution, deleteSolution,addSolution,votes, voteOnSolution, fetchAllVotes } = useContext(HelpDeskContext);
+    const { problem, deleteProblem, updateProblem, updateSolution, deleteSolution,addSolution,votes, voteOnSolution, fetchAllVotes, subscripStatus, subscriptionStatus } = useContext(HelpDeskContext);
     const { tag,addSubscribe,deleteSubscription } = useContext(HelpContext);
     const {current_user} = useContext(UserContext)
     
@@ -67,6 +67,12 @@ const SingleProblem = () => {
         setShowAddSolutionForm(false);
     };
 
+    useEffect(() => {
+        if (singleProblem) { 
+            subscripStatus(singleProblem.id);
+        }
+    }, [singleProblem]);
+
 
     useEffect(() => {
         if (singleProblem?.solutions.length > 0) {
@@ -119,18 +125,26 @@ const SingleProblem = () => {
                                         <button onClick={() => deleteProblem(singleProblem.id)} className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3">Delete</button>
                                     </>
                                     )}
-                                <button
-                                    onClick={() => addSubscribe(singleProblem.id)}
-                                    className="bg-blue-600 text-white px-3 py-1 rounded-lg ml-3"
-                                >
-                                    Subscribe
-                                </button>
-                                <button
-                                    onClick={() => deleteSubscription(singleProblem.id)}
-                                    className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3"
-                                >
-                                    Unsubscribe
-                                </button>
+                                
+                                {subscriptionStatus[singleProblem.id] ?(
+                                    <button
+                                        onClick={() => deleteSubscription(singleProblem.id)}
+                                        className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3"
+                                    >
+                                        Unsubscribe
+                                    </button>
+                                
+                                ):(
+                                    <button
+                                        onClick={() => addSubscribe(singleProblem.id)}
+                                        className="bg-blue-600 text-white px-3 py-1 rounded-lg ml-3"
+                                    >
+                                        Subscribe
+                                    </button>
+                                    
+                                )}
+                                
+                                
                                 <button onClick={() => setShowAddSolutionForm(true)} className="bg-blue-500 text-white px-3 py-1 rounded-lg ml-3">
                                     Add Solution
                                 </button>
