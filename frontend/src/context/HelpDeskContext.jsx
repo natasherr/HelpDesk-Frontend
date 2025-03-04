@@ -403,38 +403,35 @@ export const HelpDeskProvider = ({children}) =>
         
 
 
-        // Function to fetch vote counts for a solution
-        const fetchAllVotes = async () => {
-            if (!solution || solution.length === 0) return;
-        
+        const fetchAllVotes = async (solution_id) => {
             try {
-                const voteRequests = solution.map((sol) =>
-                    fetch(`http://127.0.0.1:5000/solutions/${sol.id}/votes`, {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${authToken}`,
-                        },
-                    }).then((res) => res.json())
-                );
+                const response = await fetch(`http://127.0.0.1:5000/solutions/${solution_id}/votes`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${authToken}`,
+                    }
+                });
         
-                const votesData = await Promise.all(voteRequests);
+                const data = await response.json();
         
-                // Convert array to object { solutionId: voteData }
-                const votesObject = solution.reduce((acc, sol, index) => {
-                    acc[sol.id] = votesData[index];
-                    return acc;
-                }, {});
+                if (data.error) {
+                    toast.error(data.error);
+                    return null;
+                }
         
-                setVotes(votesObject);
+                setVotes((prevVotes) => ({
+                    ...prevVotes,
+                    [solution_id]: { likes: data.likes, dislikes: data.dislikes }
+                }));
+        
+                return data;
             } catch (error) {
-                console.error("Error fetching votes:", error);
+                toast.error("Failed to fetch votes");
+                console.error(error);
+                return null;
             }
         };
-        
-        useEffect(() => {
-            fetchAllVotes();
-        }, [solution]); // ✅ Runs only when `solution` changes
         
 
         

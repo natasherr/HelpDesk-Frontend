@@ -80,6 +80,7 @@ const SingleProblem = () => {
         }
     }, [singleProblem]);
     
+    
     const handleVote = (solution_id, vote_type) => {
         voteOnSolution(solution_id, vote_type);
     };
