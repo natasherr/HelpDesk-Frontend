@@ -56,11 +56,7 @@ const Navbar = () => {
                   to="/notifications"
                   className="font-medium leading-6 text-gray-300 hover:text-white transition-all duration-200"
                 >
-                  <img
-                    src="https://img.icons8.com/?size=100&id=gnsB3xE8Q5Et&format=png&color=22C3E6"
-                    alt="Notifications"
-                    className="w-6 h-6 hover:brightness-75 hover:hue-rotate-60 transition-all duration-200"
-                  />
+                  Notification
                 </Link>
                 <Link
                   to="/profile"
