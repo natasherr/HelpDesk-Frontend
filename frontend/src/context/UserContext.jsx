@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
     const navigate = useNavigate();
     const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("token"));
     const [current_user, setCurrentUser] = useState(null);
+    
 
 
     console.log("Current user:", current_user);
