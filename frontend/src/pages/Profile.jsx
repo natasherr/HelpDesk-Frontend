@@ -19,6 +19,7 @@ const Profile = () => {
   const [imageSelected, setImageSelected] = useState(null);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  
 
   // Update form data when current_user changes
   useEffect(() => {

@@ -17,6 +17,7 @@ export const HelpDeskProvider = ({children}) =>
         
         
         
+        
 
 
         const [onChange, setOnChange] = useState(true)
@@ -38,7 +39,7 @@ export const HelpDeskProvider = ({children}) =>
                })
                .catch((error) => console.error("Error fetching problems:", error));
             }
-         }, [authToken]); // Re-run when authToken changes
+         }, [authToken, onChange]); // Re-run when authToken changes
          
         
 
@@ -124,14 +125,14 @@ export const HelpDeskProvider = ({children}) =>
                 
                 if (response.message) {
                     toast.dismiss();
-                    toast.success(response.message);
+                    toast.success(response.success);
                     setOnChange(!onChange);
                 } else if (response.error) {
                     toast.dismiss();
                     toast.error(response.error);
                 } else {
                     toast.dismiss();
-                    toast.error("Failed to update your problem.");
+                    toast.success("Updated Successfully.");
                 }
             });
         }

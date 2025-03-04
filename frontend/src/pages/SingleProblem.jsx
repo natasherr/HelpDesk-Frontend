@@ -12,6 +12,7 @@ const SingleProblem = () => {
     const {current_user} = useContext(UserContext)
     
     
+    
     const [showForm, setShowForm] = useState(false);
     const [updatedProblem, setUpdatedProblem] = useState({});
     const [showSolutionForm, setShowSolutionForm] = useState(false);
@@ -132,7 +133,7 @@ const SingleProblem = () => {
                                         onClick={() => deleteSubscription(singleProblem.id)}
                                         className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3"
                                     >
-                                        Unsubscribe
+                                        Unfollow
                                     </button>
                                 
                                 ):(
@@ -140,7 +141,7 @@ const SingleProblem = () => {
                                         onClick={() => addSubscribe(singleProblem.id)}
                                         className="bg-blue-600 text-white px-3 py-1 rounded-lg ml-3"
                                     >
-                                        Subscribe
+                                        Follow
                                     </button>
                                     
                                 )}

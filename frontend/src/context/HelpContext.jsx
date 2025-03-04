@@ -41,7 +41,7 @@ export const HelpProvider = ({children}) =>
                     setNotification(response.notifications || []); // Ensure it's always an array
                 })
                 .catch((error) => console.error("Error fetching notifications:", error));
-            }, [authToken]);
+            }, [authToken,onChange]);
         
         
             // ==> Delete Notification
@@ -132,7 +132,7 @@ export const HelpProvider = ({children}) =>
                 .catch((error) => {
                     console.error("Error fetching unread notifications:", error);
                 });
-            }, [authToken]); 
+            }, [authToken,onChange]); 
             
 
         
@@ -150,7 +150,7 @@ export const HelpProvider = ({children}) =>
                     setTag(response || []); // response is already an array
                 })
                 .catch((error) => console.error("Error fetching tags:", error));
-            }, [authToken]);
+            }, [authToken,onChange]);
 
 
 
