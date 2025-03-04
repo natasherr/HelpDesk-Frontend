@@ -1,59 +1,501 @@
-import React, { useContext } from "react";
+import React, { useState,useMemo, useContext } from  "react";
+import { FaThumbsUp, FaThumbsDown, FaUser, FaSearch, FaFilter } from "react-icons/fa";
 import { HelpDeskContext } from "../context/HelpDeskContext";
-import { Link } from 'react-router-dom';
+import { UserContext } from "../context/UserContext";
 
 const Problems = () => {
-  const { problem} = useContext(HelpDeskContext);
+
+  const { problem, solution, tag, vote, getProblemById, addProblem, updateProblem, deleteProblem, getSolutionByID, addSolution, updateSolution, deleteSolution, voteOnSolution, deleteVote, addTag, updateTag, deleteTag, getTagById} = useContext(HelpDeskContext);
+  
+  const {current_user} = useContext(UserContext)
+
+  const [problemId, setProblemId] = useState("");
+  const [description, setDescription] = useState("");
+  const [editingProblem, setEditingProblem] = useState(null);
+  // Controlling visibility of the question/problem form.
+  const [showQuestionForm, setShowQuestionForm] = useState(false);
+
+  const [solutionId, setSolutionId] = useState("");
+  const [voteType, setVoteType] = useState("");
+  const [voteId, setVoteId] = useState("");
+
+  // Tags
+  const [name, setName] = useState("");
+  const [tagId, setTagId] = useState("");
+
+
+  const [questions, setQuestions] = useState([]);
+  const [formData, setFormData] = useState({
+    username: "",
+    description: "",
+    categories: []
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
+
+  const [editingReply, setEditingReply] = useState(null);
+
+  const categories = [
+    "Technical Support",
+    "Billing Inquiry",
+    "Product Information",
+    "General Feedback",
+    "Account Issues"
+  ];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.username || !formData.description || formData.categories.length === 0) {
+      alert("Please fill all required fields");
+      return;
+    }
+    const newQuestion = {
+      id: Date.now(),
+      ...formData,
+      date: new Date(),
+      replies: [],
+      likes: 0,
+      dislikes: 0
+    };
+    setQuestions(prev => [newQuestion, ...prev]);
+    setFormData({ username: "", description: "", categories: [] });
+    setShowQuestionForm(false);
+  };
+
+  const handleReply = (questionId, replyText, categories) => {
+    if (!replyText.trim()) return;
+    setQuestions(prev =>
+      prev.map(q =>
+        q.id === questionId
+          ? {
+              ...q,
+              replies: [
+                ...q.replies,
+                { 
+                  id: Date.now(), 
+                  text: replyText,
+                  categories: categories, 
+                  date: new Date(),
+                  likes: 0,
+                  dislikes: 0
+                }
+              ]
+            }
+          : q
+      )
+    );
+  };
+
+  const handleReplyVote = (questionId, replyId, type) => {
+    setQuestions(prev =>
+      prev.map(q =>
+        q.id === questionId
+          ? {
+              ...q,
+              replies: q.replies.map(reply =>
+                reply.id === replyId
+                  ? { ...reply, [type]: (reply[type] || 0) + 1 }
+                  : reply
+              )
+            }
+          : q
+      )
+    );
+  };
+
+  const handleVote = (questionId, type) => {
+    setQuestions(prev =>
+      prev.map(q =>
+        q.id === questionId
+          ? { ...q, [type]: q[type] + 1 }
+          : q
+      )
+    );
+  };
+
+  const handleUpdateQuestion = (questionId, updatedData) => {
+    setQuestions(prev =>
+      prev.map(q =>
+        q.id === questionId
+          ? { ...q, ...updatedData }
+          : q
+      )
+    );
+    setEditingProblem(null);
+  };
+
+  const handleUpdateReply = (questionId, replyId, updatedText, updatedCategories) => {
+    setQuestions(prev =>
+      prev.map(q =>
+        q.id === questionId
+          ? {
+              ...q,
+              replies: q.replies.map(reply =>
+                reply.id === replyId
+                  ? { ...reply, text: updatedText, categories: updatedCategories }
+                  : reply
+              )
+            }
+          : q
+      )
+    );
+    setEditingReply(null);
+  };
+
+  const filteredQuestions = useMemo(() => {
+    return questions
+      .filter(q => {
+        const matchesSearch = q.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFilter = selectedFilter === "all" || q.categories.includes(selectedFilter);
+        return matchesSearch && matchesFilter;
+      });
+  }, [questions, searchQuery, selectedFilter]);
+
+  const QuestionCard = ({ question }) => {
+    const [showReplyForm, setShowReplyForm] = useState(false);
+    const [replyText, setReplyText] = useState("");
+    const [replyCategories, setReplyCategories] = useState([]);
+
+    const handleSubmitReply = () => {
+      if (!replyText.trim() || replyCategories.length === 0) {
+        alert("Please provide both reply text and categories");
+        return;
+      }
+      handleReply(question.id, replyText, replyCategories);
+      setReplyText("");
+      setReplyCategories([]);
+      setShowReplyForm(false);
+    };
+
+    const [editReplyText, setEditReplyText] = useState("");
+    const [editReplyCategories, setEditReplyCategories] = useState([]);
+
+    if (editingProblem?.id === question.id) {
+      return (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-4">
+          <textarea
+            value={editingProblem.description}
+            onChange={(e) => seteditingProblem({ ...editingProblem, description: e.target.value })}
+            className="w-full p-3 border rounded-lg mb-4"
+            rows="4"
+          />
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2">
+              {categories.map(category => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => {
+                    const isSelected = editingProblem.categories.includes(category);
+                    seteditingProblem({
+                      ...editingProblem,
+                      categories: isSelected
+                        ? editingProblem.categories.filter(c => c !== category)
+                        : [...editingProblem.categories, category]
+                    });
+                  }}
+                  className={`px-4 py-2 rounded-full ${editingProblem.categories.includes(category) ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"} transition-colors`}                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleUpdateQuestion(question.id, { description: editingProblem.description, categories: editingProblem.categories })}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => seteditingProblem(null)}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 mb-4 transition-all duration-300 hover:shadow-lg">
+        <div className="flex items-center mb-4">
+          <div className="bg-gray-200 rounded-full p-2">
+            <FaUser className="text-gray-600" />
+          </div>
+          <div className="ml-3">
+            <h3 className="font-semibold text-lg">{question.username}</h3>
+            <p className="text-sm text-gray-500">
+              {new Date(question.date).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+        <p className="text-gray-700 mb-4">{question.description}</p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {question.categories.map(cat => (
+            <span key={cat} className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+              {cat}
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center gap-4 mb-4">
+          <button
+            onClick={() => handleVote(question.id, "likes")}
+            className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors"
+          >
+            <FaThumbsUp /> {question.likes}
+          </button>
+          <button
+            onClick={() => handleVote(question.id, "dislikes")}
+            className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
+          >
+            <FaThumbsDown /> {question.dislikes}
+          </button>
+          <button
+            onClick={() => setShowReplyForm(!showReplyForm)}
+            className="text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            Reply
+          </button>
+        </div>
+        {showReplyForm && (
+          <div className="mt-4">
+            <textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              className="w-full p-3 text-gray-700 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Write your reply..."
+              rows="3"
+            />
+            <div className="mt-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Categories
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {categories.map(category => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => {
+                      const isSelected = replyCategories.includes(category);
+                      setReplyCategories(
+                        isSelected
+                          ? replyCategories.filter(c => c !== category)
+                          : [...replyCategories, category]
+                      );
+                    }}
+                    className={`px-4 py-2 rounded-full ${
+                      replyCategories.includes(category)
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    } transition-colors`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={handleSubmitReply}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Submit Reply
+            </button>
+          </div>
+        )}
+        {question.replies.length > 0 && (
+          <div className="mt-4 space-y-3">
+            {question.replies.map(reply => (
+              <div key={reply.id} className="bg-gray-50 rounded-lg p-4">
+                {editingReply?.id === reply.id ? (
+                  <div>
+                    <textarea
+                      value={editReplyText}
+                      onChange={(e) => setEditReplyText(e.target.value)}
+                      className="w-full p-3 border text-gray-700 rounded-lg mb-4"
+                      rows="3"
+                    />
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2">
+                        {categories.map(category => (
+                          <button
+                            key={category}
+                            type="button"
+                            onClick={() => {
+                              const isSelected = editReplyCategories.includes(category);
+                              setEditReplyCategories(
+                                isSelected
+                                  ? editReplyCategories.filter(c => c !== category)
+                                  : [...editReplyCategories, category]
+                              );
+                            }}
+                            className={`px-4 py-2 rounded-full ${editReplyCategories.includes(category) ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"} transition-colors`}                          >
+                            {category}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleUpdateReply(question.id, reply.id, editReplyText, editReplyCategories)}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingReply(null)}
+                        className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-gray-700">{reply.text}</p>
+                    <div className="flex flex-wrap gap-2 my-2">
+                      {reply.categories && reply.categories.map(cat => (
+                        <span key={cat} className="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-full">
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-4 mt-2">
+                      <button
+                        onClick={() => {
+                          setEditingReply(reply);
+                          setEditReplyText(reply.text);
+                          setEditReplyCategories(reply.categories);
+                        }}
+                        className="text-gray-600 hover:text-blue-600 transition-colors"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div>
-      <div className="bg-gray-200 px-2 py-10">
-        <div id="features" className="mx-auto max-w-6xl">
-          <h2 className="text-center font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-            Problems
-          </h2>
-          <ul className="mt-16 flex flex-wrap justify-between gap-6 text-center text-slate-700">
-            <div className="flex flex-wrap justify-between gap-6">
-              {problem.length > 0 ? (
-                <div className="flex flex-wrap justify-between gap-6">
-                  {problem.map((problems) => (
-                    <li key={problems.id} className="rounded-xl bg-white px-6 py-8 shadow-sm w-[30%] mb-6 border border-gray-300">
-                      <img
-                        src="https://www.svgrepo.com/show/530438/ddos-protection.svg"
-                        alt=""
-                        className="mx-auto h-10 w-10"
-                      />
-                      <Link to={`/singleproblem/${problems.id}`}>
-                        <h3 className="my-3 font-display font-medium text-lg border-b pb-2 border-gray-400">
-                          Problem:
-                        </h3>
-                      </Link>
-                      <p className="mb-4 text-gray-700 font-medium font-display">{problems.description}</p>
-                      {/* Fix: Check if solutions exist and map over them */}
-                      <h4 className="mt-4 font-semibold text-md border-t pt-2 border-gray-400">
-                        Solutions:
-                      </h4>
-                      {problems.solutions.length > 0 ? (
-                        <ul className="mt-1.5 text-sm leading-6 text-secondary-500">
-                          {problems.solutions.map((sol) => (
-                            <li key={sol.id} className="border-t border-gray-300 pt-2 mt-2">
-                              {sol.description}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="mt-1.5 text-sm leading-6 text-secondary-500">No solutions yet</p>
-                      )}
-                    </li>
+    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Help Desk</h1>
+          <button
+            onClick={() => setShowQuestionForm(!showQuestionForm)}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            What's your question?
+          </button>
+        </div>
+
+        {showQuestionForm && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8 animate-fadeIn">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full p-3 border text-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+                  Problem Description
+                </label>
+                <textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full p-3 border text-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows="4"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Categories
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map(category => (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => {
+                        const isSelected = formData.categories.includes(category);
+                        setFormData({
+                          ...formData,
+                          categories: isSelected
+                            ? formData.categories.filter(c => c !== category)
+                            : [...formData.categories, category]
+                        });
+                      }}
+                      className={`px-4 py-2 rounded-full ${
+                        formData.categories.includes(category)
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 text-gray-700"
+                      } transition-colors`}
+                    >
+                      {category}
+                    </button>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No problems to display</p>
-                </div>
-              )}
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Submit Question
+              </button>
+            </form>
+          </div>
+        )}
+
+        <div className="mb-6 flex flex-wrap gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search questions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border text-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
-          </ul>
+          </div>
+          <div className="relative">
+            <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value)}
+              className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+            >
+              <option value="all">All Categories</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {filteredQuestions.map(question => (
+            <QuestionCard key={question.id} question={question} />
+          ))}
         </div>
       </div>
     </div>
