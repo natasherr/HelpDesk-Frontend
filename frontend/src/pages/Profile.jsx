@@ -1,276 +1,261 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { FiEdit2, FiX, FiUpload } from "react-icons/fi";
 import { useDropzone } from "react-dropzone";
-import { FiEdit2, FiUpload, FiUser, FiMail } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
-import ReactCrop from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
-import { useContext } from "react";
-import { UserContext } from "../context/UserContext";
+import { UserContext } from "../context/UserContext"; 
 
-const UserProfile = () => {
-  const { current_user, updateUser } = useContext(UserContext); 
-  const navigate = useNavigate(); 
 
-  const [profile, setProfile] = useState({
-    username: "",
-    email: "",
-    profilePicture: "",
+const Profile = () => {
+  const { current_user, updateUser } = useContext(UserContext); // Access user data and update function
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    username: current_user?.username || "",
+    email: current_user?.email || "",
+    profilePicture: current_user?.profile_picture || ""
   });
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(profile);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [imageSelected, setImageSelected] = useState(null);
   const [errors, setErrors] = useState({});
-  const [isUploading, setIsUploading] = useState(false);
-  const [crop, setCrop] = useState({ unit: "%", width: 50, aspect: 1 });
-  const [showCropModal, setShowCropModal] = useState(false);
-  const [tempImage, setTempImage] = useState(null);
-  const [croppedImageUrl, setCroppedImageUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Update form data when current_user changes
   useEffect(() => {
-    if (!current_user) {
-      navigate("/login");
-    } else {
-      setProfile({
-        username: current_user.username,
-        email: current_user.email,
-        profilePicture: current_user.profilePicture || "",
-      });
+    if (current_user) {
       setFormData({
         username: current_user.username,
         email: current_user.email,
-        profilePicture: current_user.profilePicture || "",
+        profilePicture: current_user.profile_picture
       });
-    }
-  }, [current_user, navigate]);
-
-  useEffect(() => {
-    if (current_user) {
-      localStorage.setItem("user", JSON.stringify(current_user));
     }
   }, [current_user]);
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size should be less than 5MB");
-        return;
-      }
       const reader = new FileReader();
       reader.onload = () => {
-        setTempImage(reader.result);
-        setShowCropModal(true);
+        setPreviewImage(reader.result);
       };
       reader.readAsDataURL(file);
+      setImageSelected(file); // Set the selected image for upload
     }
-  }, []);
+  };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: {
-      "image/jpeg": [],
-      "image/png": [],
+      "image/*": [".png", ".jpg", ".jpeg"]
     },
-    maxSize: 5 * 1024 * 1024,
+    multiple: false
   });
 
   const validateForm = () => {
     const newErrors = {};
-    if (formData.username.length < 3 || formData.username.length > 20) {
-      newErrors.username = "Username must be between 3 and 20 characters";
-    }
-    if (!/^[\w\s]+$/.test(formData.username)) {
-      newErrors.username = "Username cannot contain special characters";
-    }
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
+    if (formData.username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters long";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = async () => {
+  const uploadImage = async () => {
+    if (!imageSelected) return;
+
+    const formData = new FormData();
+    formData.append('file', imageSelected);
+    formData.append('upload_preset', 'HelpDesk'); // Replace with your upload preset
+
     try {
-      if (!validateForm()) return;
-
-      const updatedProfileData = { 
-        ...formData, 
-        profilePicture: croppedImageUrl || profile.profilePicture 
-      };
-
-      setIsUploading(true);
-
-      await updateUser(current_user.user_id, updatedProfileData);
-      toast.success("Profile updated successfully!");
-      localStorage.setItem("user", JSON.stringify(updatedProfileData));
-
+      const response = await axios.post("https://api.cloudinary.com/v1_1/daiyupel1/image/upload", formData);
+      return response.data.secure_url; // Return the URL of the uploaded image
     } catch (error) {
-      toast.error("Failed to save profile");
-      console.error("Failed to save profile:", error);
-    } finally {
-      setIsUploading(false);
-      setIsEditing(false);  // Exit edit mode after saving
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image. Please try again.");
+      return null;
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setIsLoading(true);
+      try {
+        let updatedProfilePicture = formData.profilePicture;
+        if (imageSelected) {
+          const uploadedImageUrl = await uploadImage();
+          if (uploadedImageUrl) {
+            updatedProfilePicture = uploadedImageUrl;
+          }
+        }
 
-  const calculateProfileCompletion = () => {
-    const fields = Object.values(profile).filter(Boolean).length;
-    return (fields / Object.keys(profile).length) * 100;
-  };
+        const updatedData = {
+          user_id: current_user.id, // Include user ID for the update
+          username: formData.username,
+          email: formData.email,
+          password: "", // Add password if needed
+          profile_picture: updatedProfilePicture
+        };
 
-  const onImageLoaded = (image) => {};
+        // Update user data in the backend and context
+        await updateUser(updatedData.user_id, updatedData.username, updatedData.email, updatedData.password, updatedData.profile_picture);
 
-  const onCropChange = (newCrop) => {
-    setCrop(newCrop);
-  };
-
-  const onCropComplete = (crop) => {
-    if (crop.width && crop.height) {
-      const canvas = document.createElement("canvas");
-      const image = document.createElement("img");
-      image.src = tempImage;
-      image.onload = () => {
-        const ctx = canvas.getContext("2d");
-        canvas.width = crop.width;
-        canvas.height = crop.height;
-        ctx.drawImage(
-          image,
-          crop.x,
-          crop.y,
-          crop.width,
-          crop.height,
-          0,
-          0,
-          crop.width,
-          crop.height
-        );
-        setCroppedImageUrl(canvas.toDataURL());
-      };
+        setIsEditModalOpen(false);
+        setPreviewImage(null);
+        setImageSelected(null); // Reset the selected image
+        toast.dismiss();
+        toast.success("Profile updated successfully!");
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        toast.error("Failed to update profile. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto bg-gray-800 rounded-lg shadow-md overflow-hidden">
-        <div className="p-8">
-          <div className="text-center mb-8">
-            <div className="relative inline-block">
-              {isEditing ? (
-                <div
-                  {...getRootProps()}
-                  className="w-32 h-32 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center cursor-pointer hover:border-blue-500 transition-colors"
-                >
-                  <input {...getInputProps()} />
-                  <FiUpload className="w-8 h-8 text-gray-400" />
-                </div>
-              ) : (
-                <img
-                  src={croppedImageUrl || profile.profilePicture}
-                  alt={profile.username}
-                  className="w-32 h-32 rounded-full object-cover"
-                />
-              )}
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full text-white hover:bg-blue-600 transition-colors"
-                >
-                  <FiEdit2 className="w-4 h-4" />
-                </button>
-              )}
-
-            </div>
-
-            <h2 className="mt-4 text-2xl font-bold text-white">{profile.username}</h2>
-            <div className="mt-2 text-sm text-gray-400">{profile.email}</div>
-
-            <div className="mt-4 w-full bg-gray-600 rounded-full h-2.5">
-              <div
-                className="bg-blue-500 h-2.5 rounded-full"
-                style={{ width: `${calculateProfileCompletion()}%` }}
-              ></div>
-
-            </div>
-            <p className="mt-2 text-sm text-gray-400">
-              Profile Completion: {Math.round(calculateProfileCompletion())}%
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black animate-gradient-x py-12 px-4 sm:px-6 lg:px-8"
+    // style = {{
+    //   backgroundImage: `url('/bg.png')`,
+    //   backgroundSize: "cover",
+    //   backgroundPosition: "center",
+    //   backgroundRepeat: "no-repeat",
+    // }}
+    >
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      <div className="max-w-md mx-auto bg-gray-800/50 backdrop-blur-md rounded-lg shadow-lg overflow-hidden border border-gray-700/30 hover:shadow-xl hover:shadow-blue-500/20 transition-shadow duration-300">
+        <div className="relative p-8 pb-12">
+          <div className="absolute top-4 right-4">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="p-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:scale-110"
+              aria-label="Edit profile"
+            >
+              <FiEdit2 className="w-5 h-5" />
+            </button>
           </div>
 
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-300">Username</label>
-                <div className="flex items-center space-x-2">
-                  <FiUser className="text-gray-400" />
-                  <input
-                    type="text"
-                    name="username"
-                    disabled={!isEditing}
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  />
-
-                </div>
-                {errors.username && (
-                  <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300">Email</label>
-                <div className="flex items-center space-x-2">
-                  <FiMail className="text-gray-400" />
-                  <input
-                    type="email"
-                    name="email"
-                    disabled={!isEditing}
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  />
-
-                </div>
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
-              </div>
+          <div className="flex flex-col items-center">
+            <div className="relative w-32 h-32 mb-4 group">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <img
+                src={formData.profilePicture}
+                alt="Profile"
+                className="w-full h-full rounded-full object-cover relative z-10"
+                onError={(e) => {
+                  e.target.src = "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=";
+                }}
+              />
             </div>
-
-            <div className="flex justify-end">
-              {isEditing ? (
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="w-full sm:w-auto px-6 py-2 mt-4 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600"
-                  disabled={isUploading}
-                >
-                  {isUploading ? "Saving..." : "Save Changes"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(true)}
-                  className="w-full sm:w-auto px-6 py-2 mt-4 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600"
-                >
-                  Edit Profile
-                </button>
-              )}
-            </div>
-          </form>
+            <h1 className="text-2xl font-bold text-white text-shadow-lg shadow-gray-900">
+              {formData.username}
+            </h1>
+            <p className="text-gray-400 mt-1">{formData.email}</p>
+          </div>
         </div>
       </div>
 
-      <ToastContainer />
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4">
+          <div className="bg-gray-800 rounded-lg max-w-md w-full p-6 transform transition-all duration-300 scale-95 hover:scale-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-white">Edit Profile</h2>
+              <button
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setPreviewImage(null);
+                  setErrors({});
+                  setImageSelected(null); // Reset the selected image
+                }}
+                className="p-2 hover:bg-gray-700 rounded-full"
+                aria-label="Close modal"
+              >
+                <FiX className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-6">
+                <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className={`w-full px-3 py-2 border rounded-md ${errors.username ? "border-red-500" : "border-gray-600"} bg-gray-700 text-white`}
+                  aria-invalid={errors.username ? "true" : "false"}
+                />
+                {errors.username && (
+                  <p className="mt-1 text-sm text-red-500" role="alert">{errors.username}</p>
+                )}
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Profile Picture
+                </label>
+                <div
+                  {...getRootProps()}
+                  className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer bg-gray-700/50 hover:bg-gray-700/70"
+                >
+                  <input {...getInputProps()} />
+                  {previewImage ? (
+                    <img
+                      src={previewImage}
+                      alt="Preview"
+                      className="w-32 h-32 mx-auto rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <FiUpload className="w-8 h-8 text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-400">Drag & drop or click to select image</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setPreviewImage(null);
+                    setErrors({});
+                    setImageSelected(null); // Reset the selected image
+                  }}
+                  className="px-4 py-2 text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md hover:from-blue-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 animate-pulse"
+                >
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default UserProfile;
+export default Profile;

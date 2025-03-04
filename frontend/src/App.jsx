@@ -18,8 +18,8 @@ import { HelpProvider } from './context/HelpContext';
 import AddSolution from './pages/AddSolution';
 import AddProblem from './pages/AddProblem';
 import SingleProblem from './pages/SingleProblem';
-import CloudinaryImage from './components/CloudinaryImage';
-
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 
 export default function App() {
@@ -44,11 +44,11 @@ export default function App() {
                     <Route path="about" element={<About />} />
                     <Route path="faqs" element={<Faqs />} />
                     <Route path="notifications" element={<Notifications />} />
-                    <Route path="/t<<<<<<< ft-notificationag/:tagId" element={<Tag />} />
                     <Route path="addsolution" element={<AddSolution/>} />
                     <Route path="addproblem" element={<AddProblem/>} />
                     <Route path="/singleproblem/:id" element={<SingleProblem/>} />
-                    <Route path="cloudinary-image" element={<CloudinaryImage />} />
+                    <Route path="forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password/:token" element={<ResetPassword />} />
                     <Route path="*" element={<NoPage />} /> 
                   </Route>
                 </Route>

@@ -1,9 +1,11 @@
-
 import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import { toast } from "react-toastify";
+import ForgotPassword from '../pages/ForgotPassword';
+
 
 const Login = () => {
   const { login, current_user, login_with_google } = useContext(UserContext);
@@ -11,23 +13,16 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     login(email, password);
-
-
-    // Add login functionality here
-    // navigate('/'); // for example, after successful login
-
   };
 
   // Redirect if the user is already logged in
   useEffect(() => {
     if (current_user) {
       navigate('/');
-
     }
   }, [current_user, navigate]);
 
@@ -63,7 +58,7 @@ const Login = () => {
               </div>
 
               <div>
-                <label className="text-gray-800 text-xs block mb-2">Email</label>
+                <label className="text-white-800 text-xs block mb-2">Email</label>
                 <div className="relative flex items-center">
                   <input
                     name="email"
@@ -78,7 +73,7 @@ const Login = () => {
               </div>
 
               <div className="mt-8">
-                <label className="text-gray-800 text-xs block mb-2">Password</label>
+                <label className="text-white-800 text-xs block mb-2">Password</label>
                 <div className="relative flex items-center">
                   <input
                     name="password"
@@ -96,7 +91,7 @@ const Login = () => {
 
                 
                 <div>
-                  <a href="javascript:void(0);" className="text-blue-600 font-semibold text-sm hover:underline">Forgot Password?</a>
+                  <Link to="/forgot-password" href="javascript:void(0);" className="text-white-600 font-semibold text-sm hover:underline">Forgot Password?</Link>
                 </div>
               </div>
 

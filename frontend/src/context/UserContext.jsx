@@ -8,7 +8,6 @@ export const UserProvider = ({ children }) => {
     const navigate = useNavigate();
     const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("token"));
     const [current_user, setCurrentUser] = useState(null);
-    const [users, setUsers] = useState([]);
 
     console.log("Current user:", current_user);
 
@@ -57,7 +56,7 @@ export const UserProvider = ({ children }) => {
         });
     };
 
-    // LOGIN
+    // LOGIN WITH GOOGLE
     const login_with_google = (email) => {
         toast.loading("Logging you in ... ");
         fetch("http://127.0.0.1:5000/login_with_google", {
@@ -120,7 +119,7 @@ export const UserProvider = ({ children }) => {
                 setAuthToken(null);
                 setCurrentUser(null);
                 toast.dismiss();
-                toast.success("Successfully Logged out");
+                toast.success("Successfully Logged Out");
                 navigate("/login");
             }
         });
@@ -149,7 +148,7 @@ export const UserProvider = ({ children }) => {
     };
 
     // Add User
-    const addUser = (username, email, password) => {
+    const addUser = (username, email, password, profile_picture) => {
         toast.loading("Registering ... ");
         fetch("http://127.0.0.1:5000/users", {
             method: "POST",
@@ -157,7 +156,7 @@ export const UserProvider = ({ children }) => {
                 'Content-type': 'application/json',
             },
             body: JSON.stringify({
-               username, email, password
+               username, email, password, profile_picture
             })
         })
         .then((resp) => resp.json())
@@ -178,19 +177,24 @@ export const UserProvider = ({ children }) => {
     };
 
     // Update User
-
-    const updateUser = (user_id, username, email, password) => {
+    const updateUser = (user_id, username, email, password, profile_picture) => {
         console.log("Updating user:", username, email, password);
         toast.loading("Updating user...");
 
         fetch("http://127.0.0.1:5000/update_profile", {
-            method: "PUT",  // Changed to PUT for full update
+            method: "PUT", 
             headers: {
                 'Content-type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
 
-            body: JSON.stringify(username, email, password)
+            body: JSON.stringify({
+                user_id: user_id,
+                username: username,
+                email: email,
+                password: password,
+                profile_picture: profile_picture
+            })
         })
         .then((resp) => resp.json())
         .then((response) => {
