@@ -7,13 +7,15 @@ import { jwtDecode } from "jwt-decode";
 
 
 const Register = () => {
+
+  const {addUser} = useContext(UserContext);
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
-  const { addUser } = useContext(UserContext); // Access addUser from context
-  const navigate = useNavigate(); // Initialize useNavigate
+  // const [profilePicture, setProfilePicture] = useState(null);
+  // const navigate = useNavigate();
 
   // To handle form submission
   const handleSubmit = (e) => {
@@ -21,15 +23,10 @@ const Register = () => {
 
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
-      return;
     }
 
-    // Use the addUser function from the context
-    addUser(username, email, password);
-
-    // After successful registration, navigate to the login page
-    // You can handle the navigation inside the addUser function via a callback or after the registration is successful.
-    navigate('/login');
+    addUser(username, email, password)
+    console.log({ username, email});
   };
 
 
@@ -37,7 +34,7 @@ const Register = () => {
     console.log("Sign up token:",token)
 
     const decoded = jwtDecode(token)
-    addUser(decoded.family_name, decoded.email, password)
+    addUser(decoded.given_name, decoded.email, password, decoded.picture)
     
     console.log(decoded)
   }

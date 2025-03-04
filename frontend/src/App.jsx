@@ -17,11 +17,10 @@ import Tag from './pages/Tag';
 import { HelpProvider } from './context/HelpContext';
 import AddProblem from './pages/AddProblem';
 import SingleProblem from './pages/SingleProblem';
-import CloudinaryImage from './components/CloudinaryImage';
 import NotiSolution from './pages/NotiSolution';
 import TagProblem from './pages/TagProblem';
-
-
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 
 
@@ -53,7 +52,8 @@ export default function App() {
                     <Route path="/solutions/:notificationId" element={<NotiSolution />} />
                     <Route path="addproblem" element={<AddProblem/>} />
                     <Route path="/singleproblem/:id" element={<SingleProblem/>} />
-                    <Route path="cloudinary-image" element={<CloudinaryImage />} />
+                    <Route path="forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password/:token" element={<ResetPassword />} />
                     <Route path="*" element={<NoPage />} /> 
                   </Route>
                 </Route>
