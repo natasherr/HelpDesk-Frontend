@@ -48,12 +48,6 @@ const Navbar = () => {
                 >
                   Add Problem
                 </Link>
-                <Link
-                  to="/addsolution"
-                  className="mr-6 font-medium leading-6 text-gray-300 hover:text-white hover:scale-105 transition-all duration-200"
-                >
-                  Add Solution
-                </Link>
               </nav>
 
               {/* Profile and Logout Section */}

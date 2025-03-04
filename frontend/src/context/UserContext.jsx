@@ -9,52 +9,63 @@ export const UserProvider = ({ children }) => {
     const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("token"));
     const [current_user, setCurrentUser] = useState(null);
 
+
     console.log("Current user:", current_user);
 
     // LOGIN
-    const login = (email, password) => {
-        toast.loading("Logging you in ... ");
-        fetch("http://127.0.0.1:5000/login", {
-            method: "POST",
-            headers: {
-                'Content-type': 'application/json',
-            },
-            body: JSON.stringify({
-                email, password
-            })
-        })
-        .then((resp) => resp.json())
-        .then((response) => {
-            if (response.access_token) {
-                toast.dismiss();
-                sessionStorage.setItem("token", response.access_token);
-                setAuthToken(response.access_token);
-
-                fetch('http://127.0.0.1:5000/current_user', {
-                    method: "GET",
-                    headers: {
-                        'Content-type': 'application/json',
-                        'Authorization': `Bearer ${response.access_token}`
-                    }
+    const login = (email, password) => 
+        {
+            toast.loading("Logging you in ... ")
+            fetch("http://127.0.0.1:5000/login",{
+                method:"POST",
+                headers: {
+                    'Content-type': 'application/json',
+                  },
+                body: JSON.stringify({
+                    email, password
                 })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.email) {
-                        setCurrentUser(response);
-                    }
-                });
+            })
+            .then((resp)=>resp.json())
+            .then((response)=>{
+                if(response.access_token){
+                    toast.dismiss()
+    
+                    sessionStorage.setItem("token", response.access_token);
+    
+                    setAuthToken(response.access_token)
+    
+                    fetch('http://127.0.0.1:5000/current_user',{
+                        method:"GET",
+                        headers: {
+                            'Content-type': 'application/json',
+                            Authorization: `Bearer ${response.access_token}`
+                        }
+                    })
+                    .then((response) => response.json())
+                    .then((response) => {
+                      if(response.email){
+                              setCurrentUser(response)
+                            }
+                    });
+    
+                    toast.success("Successfully Logged in")
+                    navigate("/")
+                }
+                else if(response.error){
+                    toast.dismiss()
+                    toast.error(response.error)
+    
+                }
+                else{
+                    toast.dismiss()
+                    toast.error("Failed to login")
+    
+                }
+              
+                
+            })
+        };
 
-                toast.success("Successfully Logged in");
-                navigate("/");
-            } else if (response.error) {
-                toast.dismiss();
-                toast.error(response.error);
-            } else {
-                toast.dismiss();
-                toast.error("Either email/password is incorrect");
-            }
-        });
-    };
 
     // LOGIN WITH GOOGLE
     const login_with_google = (email) => {
@@ -102,50 +113,63 @@ export const UserProvider = ({ children }) => {
     };
 
     // LOGOUT
-    const logout = () => {
-        toast.loading("Logging out ... ");
-        fetch("http://127.0.0.1:5000/logout", {
-            method: "DELETE",
+    const logout = () => 
+    {
+
+        toast.loading("Logging out ... ")
+        fetch("http://127.0.0.1:5000/logout",{
+            method:"DELETE",
             headers: {
                 'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
+                Authorization: `Bearer ${authToken}`
+              },
+       
         })
-        .then((resp) => resp.json())
-        .then((response) => {
-            console.log(response);
-            if (response.success) {
+        .then((resp)=>resp.json())
+        .then((response)=>{
+           console.log(response);
+           
+            if(response.success)
+            {
                 sessionStorage.removeItem("token");
-                setAuthToken(null);
-                setCurrentUser(null);
-                toast.dismiss();
-                toast.success("Successfully Logged Out");
-                navigate("/login");
+
+                setAuthToken(null)
+                setCurrentUser(null)
+
+                toast.dismiss()
+                toast.success("Successfully Logged out")
+
+                navigate("/login")
+
             }
-        });
+        })
+
     };
 
-    // Fetch current user
-    useEffect(() => {
-        fetchCurrentUser();
-    }, [authToken]);
 
-    const fetchCurrentUser = () => {
-        console.log("Current user fcn:", authToken);
-        fetch("http://127.0.0.1:5000/current_user", {
-            method: "GET",
+    // Fetch current user
+    useEffect(()=>{
+        fetchCurrentUser()
+    }, [])
+    const fetchCurrentUser = () => 
+    {
+        console.log("Current user fcn ",authToken);
+        
+        fetch('http://127.0.0.1:5000/current_user',{
+            method:"GET",
             headers: {
                 'Content-type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                Authorization: `Bearer ${authToken}`
             }
         })
         .then((response) => response.json())
         .then((response) => {
-            if (response.email) {
-                setCurrentUser(response);
-            }
-        })
+          if(response.email){
+           setCurrentUser(response)
+          }
+        });
     };
+
 
     // Add User
     const addUser = (username, email, password, profile_picture) => {
@@ -176,7 +200,7 @@ export const UserProvider = ({ children }) => {
         });
     };
 
-    // Update User
+
     const updateUser = (user_id, username, email, password, profile_picture) => {
         console.log("Updating user:", username, email, password);
         toast.loading("Updating user...");
@@ -268,10 +292,11 @@ export const UserProvider = ({ children }) => {
 
     const data = {
         authToken,
+        current_user,
         login,
         login_with_google,
         logout,
-        current_user,
+
         fetchCurrentUser,
         addUser,
         updateUser,
