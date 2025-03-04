@@ -273,7 +273,6 @@ export const HelpDeskProvider = ({children}) =>
                         toast.dismiss();
                         toast.success(response.message);
                         setOnChange(!onChange);
-                        navigate("/problems")
                     } else if (response.error) {
                         toast.dismiss();
                         toast.error(response.error);
