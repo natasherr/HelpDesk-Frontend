@@ -211,7 +211,6 @@ Fetching solutions:
    ```bash
    git clone https://github.com/natasherr/HelpDesk-Frontend
 
-   ```bash
    git clone https://github.com/natasherr/HelpDesk-Backend
 
 2. Install backend dependencies:
@@ -251,7 +250,7 @@ pipenv run pytest
 ## Contact Information
 Brian Joseph - brianjoseph8132@gmail.com
 Ashley Natasha - ashleyotsiula@gmail.com
-Victor Kichwen - 
+Victor Kichwen - vkipchirchir@gmail.com
 
 ## License
 ### MIT License
