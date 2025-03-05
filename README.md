@@ -1,6 +1,9 @@
 # HelpDesk System
 
-### Group Members: [Ashley Natasha,Brian Joseph and Victor Kichwen]
+### Group Members:
+- Ashley Natasha
+- Brian Joseph
+- Victor Kichwen
 #### Date: 2025/02/17 - 2025/03/05 
 
 ## Live Link
