@@ -1,6 +1,9 @@
 # HelpDesk System
 
-### Group Members: [Ashley Natasha,Brian Joseph and Victor Kichwen]
+### Group Members:
+- Ashley Natasha
+- Brian Joseph
+- Victor Kichwen
 #### Date: 2025/02/17 - 2025/03/05 
 
 ## Live Link
@@ -28,31 +31,26 @@ The system will help reduce redundancy, encourage collaboration, and enhance the
 
 ## User Stories
 
-- *Student*
+- A user can:
   - Raise technical issues or problems they encounter.
   - Post solutions to other students’ problems.
   - Vote on the most helpful solutions provided by others.
   - Mark and follow questions of interest to track responses.
   - Receive notifications when there are new answers, votes, or responses.
 
-- *Administrator*
-  - Manage user accounts and authentication.
-  - Monitor and moderate posts and solutions for accuracy and appropriateness.
-  - Generate reports based on user activity and problem-solving trends.
-
 ## Features
 
 ### Authentication
-- *Login/Signup*: Students can create an account, log in, and manage their profiles securely.
+- *Login/Signup*: Users can create an account, log in, and manage their profiles securely.
 - *Password Reset*: Secure password recovery functionality.
   
 ### Problem Management
-- *Raise Problem*: Students can submit a new problem, specifying details such as the issue type, category, and description.
+- *Raise Problem*: Users can submit a new problem, specifying details such as the issue type, category, and description.
 - *Tagging Problems*: Each problem can be tagged with relevant categories, such as "language", "stage", or "technical issue".
 - *Link Similar Problems*: Related issues can be linked to guide students toward similar problems with possible solutions.
 
 ### Solution Management
-- *Post Solutions*: Students can reply to problems by posting solutions, whether they are answers to questions or suggestions.
+- *Post Solutions*: Users can reply to problems by posting solutions, whether they are answers to questions or suggestions.
 - *Vote on Solutions*: Users can vote on solutions to indicate their usefulness. The most helpful solutions will rise to the top.
 
 ### Notifications
@@ -62,16 +60,11 @@ The system will help reduce redundancy, encourage collaboration, and enhance the
 ### FAQ System
 - *Frequently Asked Questions*: Common issues and solutions will be compiled into an FAQ section for easy access.
 
-### Search and Filter
-- *Search Functionality*: Easily search for problems and solutions using keywords.
-- *Filter by Tags*: Filter problems and solutions based on categories such as "language", "stage", or "technical challenge".
-
 ## Technologies Used
 
 - *Backend*: Flask (Python)
 - *Database*: PostgreSQL
 - *Frontend*: React.js (with Context API for state management)
-- *Testing*: Pytest
 - *API*: RESTful APIs to handle problem raising, solution posting, and voting
 - *Authentication*: JWT (JSON Web Tokens) for secure authentication and OAuth for social authentication
 
@@ -88,19 +81,19 @@ The homepage provides easy navigation, displaying the latest problems, popular s
 
 ![Alt text](/frontend/public/Home%20Page.png "Home Page")
 
-## API Endpoints
-
-
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.8
-- Node.js 
+- Javascript
+- React(Vite)
 - NPM
-- PostgreSQL
+- Tailwind CSS
+- Toastify
 
-## Response Format
+## API Endpoints
+
+### Response Format
 Fetching problems:
 ```jsx
    {
@@ -211,7 +204,6 @@ Fetching solutions:
    ```bash
    git clone https://github.com/natasherr/HelpDesk-Frontend
 
-   ```bash
    git clone https://github.com/natasherr/HelpDesk-Backend
 
 2. Install backend dependencies:
@@ -241,17 +233,11 @@ Fetching solutions:
    npm run dev
    ```
    
-### Testing
-
-To run tests with Pytest:
-```
-pipenv run pytest
-```
 
 ## Contact Information
-Brian Joseph - brianjoseph8132@gmail.com
-Ashley Natasha - ashleyotsiula@gmail.com
-Victor Kichwen - 
+- Brian Joseph - brianjoseph8132@gmail.com
+- Ashley Natasha - ashleyotsiula@gmail.com
+- Victor Kichwen - vkipchirchir@gmail.com
 
 ## License
 ### MIT License
