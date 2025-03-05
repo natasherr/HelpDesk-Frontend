@@ -18,15 +18,7 @@ const Home = () => {
                   Our HelpDesk system makes it easier than ever to resolve technical issues, provide solutions and connect with our community.
                   Get immediate support with a few clicks.
                 </p>
-                <div className="relative flex flex-col sm:flex-row sm:space-x-4">
-                  <Link
-                    to="/addproblem"
-                    className="flex items-center w-full px-6 py-3 mb-3 text-lg text-white bg-indigo-600 rounded-md sm:mb-0 hover:bg-indigo-700 sm:w-auto"
-                  >
-                    What's your question?
-                    
-                  </Link>
-                </div>
+               
               </div>
             </div>
             <div className="w-full md:w-1/2">
