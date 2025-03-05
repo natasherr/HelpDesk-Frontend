@@ -11,11 +11,11 @@
 
 ## Introduction
 
-The *HelpDesk System* is a web-based platform designed to streamline technical problem-solving and provide a collaborative environment for students. It allows users to raise issues, find solutions, vote on useful answers, and track responses efficiently. The platform supports various tags for easy filtering of problems and solutions based on different criteria, such as language, stage of learning, or technical challenge. Built with an emphasis on APIs, the system enables seamless integration and functionality for all users, fostering a collaborative community of learners.
+The *HelpDesk System* is a web-based platform that simplifies technical problem-solving for students. Users can raise issues, find solutions, vote on helpful answers, and track responses. It supports tags for easy filtering by language, learning stage, or technical challenge. With API-driven functionality, it fosters seamless integration and a collaborative learning community.
 
 ## Problem Statement
 
-Students face a recurring set of technical problems and challenges during their learning journey. These issues are often repetitive, and students may struggle to find quick, relevant solutions. The duplication of efforts in solving these problems can lead to frustration and inefficiency. Furthermore, users may have difficulty navigating through solutions to find the most relevant ones.
+Students often encounter recurring challenges and struggle to find quick, relevant solutions. Repeating efforts can be frustrating and inefficient, and navigating solutions can be difficult.
 
 ## Solution
 
@@ -79,7 +79,7 @@ An Entity-Relationship Diagram (ERD) illustrating the structure of the database:
 ### Home Page
 The homepage provides easy navigation, displaying the latest problems, popular solutions, and access to various categories:
 
-![Alt text](/frontend/public/Home%20Page.png "Home Page")
+![Alt text](/frontend/public/home.png "Home Page")
 
 ## Getting Started
 
