@@ -26,7 +26,7 @@ export const HelpDeskProvider = ({children}) =>
         // Fetch problems
         useEffect(() => {
             if (authToken) {
-               fetch('http://127.0.0.1:5000/problems', {
+               fetch('https://helpdesk-backend-jq1g.onrender.com/problems', {
                    method: "GET",
                    headers: {
                        'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export const HelpDeskProvider = ({children}) =>
 
     // Fetch problem by ID
     const getProblemById = (problem_id) => {
-        return fetch(`http://127.0.0.1:5000/problems/${problem_id}`, {
+        return fetch(`https://helpdesk-backend-jq1g.onrender.com/problems/${problem_id}`, {
             method: "GET",
             headers: {
                 'Content-type': 'application/json',
@@ -72,7 +72,7 @@ export const HelpDeskProvider = ({children}) =>
         const addProblem = (description, tag_id) => 
             {
                 toast.loading("Uploading your problem... ")
-                fetch("http://127.0.0.1:5000/problems",{
+                fetch("https://helpdesk-backend-jq1g.onrender.com/problems",{
                     method:"POST",
                     headers: {
                         'Content-type': 'application/json',
@@ -108,7 +108,7 @@ export const HelpDeskProvider = ({children}) =>
         // Update Problem
         const updateProblem = (problem_id,description, tag_id) => {
             toast.loading("Updating your Problem... ");
-            fetch(`http://127.0.0.1:5000/problems/${problem_id}`, {
+            fetch(`https://helpdesk-backend-jq1g.onrender.com/${problem_id}`, {
                 method: "PUT",
                 headers: {
                     'Content-type': 'application/json',
@@ -141,7 +141,7 @@ export const HelpDeskProvider = ({children}) =>
         const deleteProblem = (problem_id) => 
             {
                 toast.loading("Deleting Problem ... ")
-                fetch(`http://127.0.0.1:5000/problems/${problem_id}`,{
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/problems/${problem_id}`,{
                     method:"DELETE",
                     headers: {
                         'Content-type': 'application/json',
@@ -176,7 +176,7 @@ export const HelpDeskProvider = ({children}) =>
         // fetching subscription status
         const subscripStatus = async (problem_id) => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/subscription-status/${problem_id}`, {
+                const response = await fetch(`https://helpdesk-backend-jq1g.onrender.com/subscription-status/${problem_id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -209,7 +209,7 @@ export const HelpDeskProvider = ({children}) =>
         useEffect(() => {
             if (!authToken) return; // Prevent fetch if authToken is missing
         
-            fetch('http://127.0.0.1:5000/solutions', {
+            fetch('https://helpdesk-backend-jq1g.onrender.com/solutions', {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ export const HelpDeskProvider = ({children}) =>
 
         // Fetch solution by ID
         const getSolutionByID = (solution_id) => {
-            return fetch(`http://127.0.0.1:5000/solutions/${solution_id}`, {
+            return fetch(`https://helpdesk-backend-jq1g.onrender.com/solutions/${solution_id}`, {
                 method: "GET",
                 headers: {
                     'Content-type': 'application/json',
@@ -258,7 +258,7 @@ export const HelpDeskProvider = ({children}) =>
         // Add Solution
         const addSolution = (description, tag_id, problem_id) => {
             toast.loading("Uploading your solution...");
-            fetch("http://127.0.0.1:5000/solutions", {
+            fetch("https://helpdesk-backend-jq1g.onrender.com/solutions", {
                 method: "POST",
                 headers: {
                     'Content-type': 'application/json',
@@ -287,7 +287,7 @@ export const HelpDeskProvider = ({children}) =>
         // Update Solution
         const updateSolution = (solution_id, description, tag_id, problem_id) => {
             toast.loading("Updating your solution...");
-            fetch(`http://127.0.0.1:5000/solutions/${solution_id}`, {
+            fetch(`https://helpdesk-backend-jq1g.onrender.com/solutions/${solution_id}`, {
                 method: "PUT",
                 headers: {
                     'Content-type': 'application/json',
@@ -319,7 +319,7 @@ export const HelpDeskProvider = ({children}) =>
         // Delete Solution
         const deleteSolution = (solution_id) => {
             toast.loading("Deleting solution...");
-            fetch(`http://127.0.0.1:5000/solutions/${solution_id}`, {
+            fetch(`https://helpdesk-backend-jq1g.onrender.com/solutions/${solution_id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${authToken}`
@@ -346,7 +346,7 @@ export const HelpDeskProvider = ({children}) =>
     // Add tag
     const addTag = (name) => {
         toast.loading("Adding tag...");
-        fetch("http://127.0.0.1:5000/tags", {
+        fetch("https://helpdesk-backend-jq1g.onrender.com/tags", {
             method: "POST",
             headers: {
                 'Content-type': 'application/json',
@@ -375,7 +375,7 @@ export const HelpDeskProvider = ({children}) =>
         const voteOnSolution = (solution_id, vote_type) => {
             toast.loading("Recording your vote...");
         
-            fetch(`http://127.0.0.1:5000/solutions/${solution_id}/vote`, {
+            fetch(`https://helpdesk-backend-jq1g.onrender.com/solutions/${solution_id}/vote`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -405,7 +405,7 @@ export const HelpDeskProvider = ({children}) =>
 
         const fetchAllVotes = async (solution_id) => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/solutions/${solution_id}/votes`, {
+                const response = await fetch(`https://helpdesk-backend-jq1g.onrender.com/solutions/${solution_id}/votes`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

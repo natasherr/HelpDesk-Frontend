@@ -29,7 +29,7 @@ export const HelpProvider = ({children}) =>
 
         // ====================notification=============
             useEffect(() => {
-                fetch(`http://127.0.0.1:5000/notifications`, {
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/notifications`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const HelpProvider = ({children}) =>
             // ==> Delete Notification
             const deleteNotification = (id) => {
                 toast.loading("Deleting Notification...");
-                fetch(`http://127.0.0.1:5000/notifications/${id}`, {
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/notifications/${id}`, {
                     method: "DELETE",
                     headers: {
                         'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export const HelpProvider = ({children}) =>
             // ===> Mark as read
             const markAsRead = (notification_id) => {
                 toast.loading("marking as Read ...");
-                fetch(`http://127.0.0.1:5000/notifications/${notification_id}/marks`,{
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/notifications/${notification_id}/marks`,{
                     method: "PUT",
                     headers: {
                         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ export const HelpProvider = ({children}) =>
                     return;
                 }
             
-                fetch("http://127.0.0.1:5000/notifications/unread", {
+                fetch("https://helpdesk-backend-jq1g.onrender.com/notifications/unread", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -138,7 +138,7 @@ export const HelpProvider = ({children}) =>
         
             // =======================TAG======================
             useEffect(() => {
-                fetch(`http://127.0.0.1:5000/tags`, { 
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/tags`, { 
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -157,7 +157,7 @@ export const HelpProvider = ({children}) =>
 
             //  ===> fetching solution based on a tag
             const fetchSolutionByTag = (tagId) => {
-                fetch(`http://127.0.0.1:5000/tags/${tagId}/solutions`, {
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/tags/${tagId}/solutions`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -189,7 +189,7 @@ export const HelpProvider = ({children}) =>
 
             // fetching problems based on a tag
             const fetchProblemByTag = (tagId) => {
-                fetch(`http://127.0.0.1:5000/tags/${tagId}/problems`,{
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/tags/${tagId}/problems`,{
                     method: "GET",
                     headers:{
                         "Content-Type": "application/json",
@@ -221,7 +221,7 @@ export const HelpProvider = ({children}) =>
 
             // ================= FAQS==============
             useEffect(() => {
-                fetch(`http://127.0.0.1:5000/faqs`, {
+                fetch(`https://helpdesk-backend-jq1g.onrender.com/faqs`, {
                     method: "GET",
                     headers: {
                         'Content-type': 'application/json',
@@ -241,7 +241,7 @@ export const HelpProvider = ({children}) =>
         const addSubscribe = (problem_id) => {
             toast.loading("Subscribing to the Question....");
             
-            fetch("http://127.0.0.1:5000/subscribe", {
+            fetch("https://helpdesk-backend-jq1g.onrender.com/subscribe", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -275,7 +275,7 @@ export const HelpProvider = ({children}) =>
         // Unsubscribing
         const deleteSubscription = (problem_id) => {
             toast.loading("Unsubscribing from the Problem...");
-            fetch(`http://127.0.0.1:5000/unsubscribe/${problem_id}`, {
+            fetch(`https://helpdesk-backend-jq1g.onrender.com/unsubscribe/${problem_id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
