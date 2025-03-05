@@ -61,7 +61,6 @@ The system will help reduce redundancy, encourage collaboration, and enhance the
 - *Frequently Asked Questions*: Common issues and solutions will be compiled into an FAQ section for easy access.
 
 ## Technologies Used
-
 - *Backend*: Flask (Python)
 - *Database*: PostgreSQL
 - *Frontend*: React.js (with Context API for state management)
