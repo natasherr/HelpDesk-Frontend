@@ -4,20 +4,17 @@ import { HelpDeskContext } from "../context/HelpDeskContext";
 import { HelpContext } from "../context/HelpContext";
 import { UserContext } from "../context/UserContext";
 
-
 const SingleProblem = () => {
     const { id } = useParams();
-    const { problem, deleteProblem, updateProblem, updateSolution, deleteSolution,addSolution,votes, voteOnSolution, fetchAllVotes, subscripStatus, subscriptionStatus } = useContext(HelpDeskContext);
-    const { tag,addSubscribe,deleteSubscription } = useContext(HelpContext);
-    const {current_user} = useContext(UserContext)
-    
-    
-    
+    const { problem, deleteProblem, updateProblem, updateSolution, deleteSolution, addSolution, votes, voteOnSolution, fetchAllVotes, subscripStatus, subscriptionStatus } = useContext(HelpDeskContext);
+    const { tag, addSubscribe, deleteSubscription } = useContext(HelpContext);
+    const { current_user } = useContext(UserContext);
+
     const [showForm, setShowForm] = useState(false);
     const [updatedProblem, setUpdatedProblem] = useState({});
     const [showSolutionForm, setShowSolutionForm] = useState(false);
     const [updatedSolution, setUpdatedSolution] = useState({});
-    const [tagId, setTagId] = useState(""); // Define tagId state
+    const [tagId, setTagId] = useState("");
     const [description, setDescription] = useState("");
     const [showAddSolutionForm, setShowAddSolutionForm] = useState(false);
 
@@ -31,7 +28,7 @@ const SingleProblem = () => {
 
     const handleSaveChanges = () => {
         if (updatedProblem.description) {
-            updateProblem(singleProblem.id, updatedProblem.description, tagId); // Pass tagId when saving
+            updateProblem(singleProblem.id, updatedProblem.description, tagId);
             setShowForm(false);
         }
     };
@@ -47,7 +44,7 @@ const SingleProblem = () => {
 
     const handleSaveSolutionChanges = () => {
         if (updatedSolution.description) {
-            updateSolution(updatedSolution.id, updatedSolution.description, tagId); // Pass tagId for solution
+            updateSolution(updatedSolution.id, updatedSolution.description, tagId);
             setShowSolutionForm(false);
         }
     };
@@ -69,28 +66,26 @@ const SingleProblem = () => {
     };
 
     useEffect(() => {
-        if (singleProblem) { 
+        if (singleProblem) {
             subscripStatus(singleProblem.id);
         }
     }, [singleProblem]);
-
 
     useEffect(() => {
         if (singleProblem?.solutions.length > 0) {
             singleProblem.solutions.forEach((sol) => fetchAllVotes(sol.id));
         }
     }, [singleProblem]);
-    
-    
+
     const handleVote = (solution_id, vote_type) => {
         voteOnSolution(solution_id, vote_type);
     };
 
     return (
-        <div className="min-h-screen flex flex-col p-12 sm:p-20 md:p-28 justify-center bg-gray-100">
+        <div className="min-h-screen flex flex-col p-12 sm:p-20 md:p-28 justify-center bg-gray-900">
             <div data-theme="teal" className="mx-auto max-w-7xl">
-                <section className="font-sans text-black">
-                    <div className="lg:flex lg:items-center bg-white shadow-2xl rounded-2xl overflow-hidden">
+                <section className="font-sans text-white">
+                    <div className="lg:flex lg:items-center bg-gray-800 shadow-2xl rounded-2xl overflow-hidden">
                         {/* Image Section */}
                         <div className="flex-shrink-0 self-stretch lg:w-1/3">
                             <img
@@ -99,82 +94,79 @@ const SingleProblem = () => {
                                 alt=""
                             />
                         </div>
-                        
+
                         {/* Text Section */}
                         {singleProblem ? (
-                            <div className="p-10 lg:p-16 bg-gray-200 lg:w-2/3">
-                                <h2 className="text-5xl font-bold text-gray-800">{singleProblem.description}</h2>
+                            <div className="p-10 lg:p-16 bg-gray-700 lg:w-2/3">
+                                <h2 className="text-5xl font-bold text-white">{singleProblem.description}</h2>
                                 {Array.isArray(singleProblem?.tag) ? (
                                     singleProblem.tag.map((nam) => (
-                                        <span key={nam.id} className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                        <span key={nam.id} className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full">
                                             {nam.name}
                                         </span>
                                     ))
                                 ) : (
                                     singleProblem?.tag && (
-                                        <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                        <span className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full">
                                             {singleProblem.tag.name}
                                         </span>
                                     )
                                 )}
 
-                                <hr className="mt-6 mb-6 border-t-2 border-gray-400" />
-                                {/* show buttons only if the logged-in user is the one who posted the problem */}
+                                <hr className="mt-6 mb-6 border-t-2 border-gray-600" />
 
+                                {/* Show buttons only if the logged-in user is the one who posted the problem */}
                                 {singleProblem?.user?.id === current_user?.id && (
                                     <>
                                         <button onClick={handleEdit} className="bg-green-600 text-white px-3 py-1 rounded-lg ml-3">Edit</button>
                                         <button onClick={() => deleteProblem(singleProblem.id)} className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3">Delete</button>
                                     </>
-                                    )}
-                                
-                                {subscriptionStatus[singleProblem.id] ?(
+                                )}
+
+                                {subscriptionStatus[singleProblem.id] ? (
                                     <button
                                         onClick={() => deleteSubscription(singleProblem.id)}
                                         className="bg-red-600 text-white px-3 py-1 rounded-lg ml-3"
                                     >
                                         Unfollow
                                     </button>
-                                
-                                ):(
+                                ) : (
                                     <button
                                         onClick={() => addSubscribe(singleProblem.id)}
                                         className="bg-blue-600 text-white px-3 py-1 rounded-lg ml-3"
                                     >
                                         Follow
                                     </button>
-                                    
                                 )}
-                                
-                                
+
                                 <button onClick={() => setShowAddSolutionForm(true)} className="bg-blue-500 text-white px-3 py-1 rounded-lg ml-3">
                                     Add Solution
                                 </button>
-                                
-                                <hr className="mt-6 mb-6 border-t-2 border-gray-400" />
-                                
+
+                                <hr className="mt-6 mb-6 border-t-2 border-gray-600" />
+
                                 {singleProblem.solutions.length > 0 ? (
-                                    <div className="max-h-60 overflow-y-auto"> {/* Added scrollable area */}
-                                        <h3 className="text-2xl font-semibold text-gray-700">Solutions:</h3>
+                                    <div className="max-h-60 overflow-y-auto">
+                                        <h3 className="text-2xl font-semibold text-white">Solutions:</h3>
                                         {singleProblem?.solutions.map((sol) => (
                                             <div key={sol.id} className="mt-4">
-                                                <p className="text-lg text-gray-700">{sol.description}</p>
-                                                {sol?.tag &&(
-                                                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                                <p className="text-lg text-gray-200">{sol.description}</p>
+                                                {sol?.tag && (
+                                                    <span className="bg-blue-600 text-white text-sm px-3 py-1 rounded-full">
                                                         {sol.tag.name}
                                                     </span>
                                                 )}
 
-                                                <hr className="mt-6 mb-6 border-t-2 border-gray-400" />
+                                                <hr className="mt-6 mb-6 border-t-2 border-gray-600" />
 
                                                 {/* Show edit & delete buttons only for the solution's owner */}
                                                 {sol.user?.id === current_user?.id && (
                                                     <>
                                                         <button onClick={() => handleEditSolution(sol)} className="bg-yellow-600 text-white px-2 py-1 rounded mt-2">
-                                                        Edit
+                                                            Edit
                                                         </button>
                                                         <button onClick={() => deleteSolution(sol.id)} className="bg-red-600 text-white px-2 py-1 rounded mt-2 ml-3">
-                                                        Delete
+                                                            Delete
                                                         </button>
                                                     </>
                                                 )}
@@ -188,12 +180,12 @@ const SingleProblem = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="mt-4 text-lg text-gray-600">No solutions yet</p>
+                                    <p className="mt-4 text-lg text-gray-400">No solutions yet</p>
                                 )}
                             </div>
                         ) : (
-                            <div className="text-center py-16">
-                                <p className="text-gray-500 text-2xl">Problem not found</p>
+                            <div className="text-center py-16 bg-gray-800 rounded-lg shadow-sm">
+                                <p className="text-gray-400 text-2xl font-semibold">Loading problem...</p>
                             </div>
                         )}
                     </div>
@@ -203,19 +195,19 @@ const SingleProblem = () => {
             {/* Edit Problem Form */}
             {showForm && (
                 <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg w-1/3">
-                        <h2 className="text-xl font-semibold mb-4">Edit Problem</h2>
+                    <div className="bg-gray-800 p-6 rounded-lg w-1/3">
+                        <h2 className="text-xl font-semibold mb-4 text-white">Edit Problem</h2>
                         <input
                             type="text"
                             value={updatedProblem.description}
                             onChange={(e) => setUpdatedProblem({ ...updatedProblem, description: e.target.value })}
-                            className="w-full border p-2 rounded text-gray-700"
+                            className="w-full border p-2 rounded bg-gray-700 text-white"
                         />
                         <select
                             id="tag"
-                            className="bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="bg-gray-700 text-white font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-3"
                             value={tagId}
-                            onChange={(e) => setTagId(e.target.value)} // Update the tagId when changed
+                            onChange={(e) => setTagId(e.target.value)}
                             required
                         >
                             <option value="">Select a tag</option>
@@ -236,19 +228,19 @@ const SingleProblem = () => {
             {/* Edit Solution Form */}
             {showSolutionForm && (
                 <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg w-1/3">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-700">Edit Solution</h2>
+                    <div className="bg-gray-800 p-6 rounded-lg w-1/3">
+                        <h2 className="text-xl font-semibold mb-4 text-white">Edit Solution</h2>
                         <input
                             type="text"
                             value={updatedSolution.description}
                             onChange={(e) => setUpdatedSolution({ ...updatedSolution, description: e.target.value })}
-                            className="w-full border p-2 rounded text-gray-700"
+                            className="w-full border p-2 rounded bg-gray-700 text-white"
                         />
                         <select
                             id="tag"
-                            className="bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="bg-gray-700 text-white font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-3"
                             value={tagId}
-                            onChange={(e) => setTagId(e.target.value)} // Update the tagId for solution
+                            onChange={(e) => setTagId(e.target.value)}
                             required
                         >
                             <option value="">Select a tag</option>
@@ -266,21 +258,20 @@ const SingleProblem = () => {
                 </div>
             )}
 
-
-            {/* Add solution Form */}
+            {/* Add Solution Form */}
             {showAddSolutionForm && (
                 <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg w-1/3">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-700">Add Solution</h2>
+                    <div className="bg-gray-800 p-6 rounded-lg w-1/3">
+                        <h2 className="text-xl font-semibold mb-4 text-white">Add Solution</h2>
                         <textarea
-                            className="w-full p-2 border rounded text-gray-700"
+                            className="w-full p-2 border rounded bg-gray-700 text-white"
                             placeholder="Describe your solution..."
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
                         <select
                             id="tag"
-                            className="bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="bg-gray-700 text-white font-semibold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-3"
                             value={tagId}
                             onChange={(e) => setTagId(e.target.value)}
                             required
@@ -297,7 +288,6 @@ const SingleProblem = () => {
                     </div>
                 </div>
             )}
-
         </div>
     );
 };
