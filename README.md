@@ -248,9 +248,9 @@ pipenv run pytest
 ```
 
 ## Contact Information
-Brian Joseph - brianjoseph8132@gmail.com
-Ashley Natasha - ashleyotsiula@gmail.com
-Victor Kichwen - vkipchirchir@gmail.com
+- Brian Joseph - brianjoseph8132@gmail.com
+- Ashley Natasha - ashleyotsiula@gmail.com
+- Victor Kichwen - vkipchirchir@gmail.com
 
 ## License
 ### MIT License
