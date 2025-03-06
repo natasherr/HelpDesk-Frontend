@@ -9,6 +9,9 @@
 ## Live Link
 [Vercel](https://helpdesk-psi.vercel.app/)
 
+## Slides Link
+[Google Slides](https://docs.google.com/presentation/d/1I6t4ed3Zt5WuEO9EJ7kQUWDLXu-tejWRnunOo0cH3io/edit#slide=id.g33c8ea0fc8c_0_6)
+
 ## Introduction
 
 The *HelpDesk System* is a web-based platform that simplifies technical problem-solving for students. Users can raise issues, find solutions, vote on helpful answers, and track responses. It supports tags for easy filtering by language, learning stage, or technical challenge. With API-driven functionality, it fosters seamless integration and a collaborative learning community.
